@@ -5,30 +5,10 @@ import { useEffect, useState } from "react";
 export function useSession(
   client: SupabaseClient<any, "public", any> = supabase
 ) {
-  const [session, setSession] = useState<
-    | {
-        data: {
-          session: Session;
-        };
-        error: null;
-      }
-    | {
-        data: {
-          session: null;
-        };
-        error: AuthError;
-      }
-    | {
-        data: {
-          session: null;
-        };
-        error: null;
-      }
-      | null
-  >(null);
+  const [session, setSession] = useState<Awaited<ReturnType<typeof client.auth.getUser>> | undefined>();
 
   async function retrieveSession() {
-    const session = await client.auth.getSession();
+    const session = await client.auth.getUser();
     setSession(session);
     console.log("Retrieved session", session);
   }

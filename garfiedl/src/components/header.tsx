@@ -1,5 +1,4 @@
-import { Link } from "react-router-dom";
-import Button from "./button";
+import Button from "./input/button";
 import supabase from "../supabase/client";
 import { useSession } from "../supabase/hooks";
 import { useAddAlert } from "./alerts/alert_hooks";
@@ -19,7 +18,7 @@ export default function MainHeader() {
       </div>
       <div>
         {
-          session === null || session.data.session === null ?
+          session === undefined || session.data.user === null ?
           <a
             href={
               window.location.pathname.length > 1
@@ -40,9 +39,7 @@ export default function MainHeader() {
         }
         <Button
           onClick={async () => {
-            // console.log(client);
             const session = await supabase.auth.getSession();
-            console.log(session);
             addAlert(<Modal flexibleHeight title="Session"><p style={{maxWidth: "75%", wordWrap: "break-word"}}>{JSON.stringify(session)}</p></Modal>)
           }}
         >

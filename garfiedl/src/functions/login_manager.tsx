@@ -10,7 +10,6 @@ export const signup = async (
     passwordConfirmation: string;
   }>,
   setLoginIncorrectContent: React.Dispatch<React.SetStateAction<ReactNode>>
-
 ) => {
   if (!isValidEmail(loginInfo.current.email)) {
     setLoginIncorrectContent(<span>Please enter a valid email.</span>);
@@ -31,13 +30,10 @@ export const signup = async (
     setLoginIncorrectContent(null);
   }
 
-  console.log(loginInfo);
-
   const { data, error } = await supabase.auth.signUp({
     email: loginInfo.current.email,
     password: loginInfo.current.password,
   });
-  console.log({ data, error });
 
   if (error !== null) {
     if (error.status === 422 && error.name === "AuthApiError") {
@@ -52,11 +48,13 @@ export const signup = async (
     } else {
       setLoginIncorrectContent(
         <span>
-          An {error.name} occured. (Code {error.code})
+          An {error.name} occured. (Code {error.code}, Message {error.message})
         </span>
       );
     }
   }
+
+  return {data,error}
 };
 
 export const login = async (
@@ -64,12 +62,7 @@ export const login = async (
     email: string;
     password: string;
   }>,
-  setLoginIncorrectContent: React.Dispatch<
-    React.SetStateAction<ReactElement<
-      any,
-      string | React.JSXElementConstructor<any>
-    > | null>
-  >
+  setLoginIncorrectContent: React.Dispatch<React.SetStateAction<ReactNode>>
 ) => {
   if (!isValidEmail(loginInfo.current.email)) {
     setLoginIncorrectContent(<span>Please enter a valid email.</span>);
@@ -80,14 +73,11 @@ export const login = async (
   } else {
     setLoginIncorrectContent(null);
   }
-  console.log(loginInfo);
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email: loginInfo.current.email,
     password: loginInfo.current.password,
   });
-
-  console.log({ data, error });
 
   if (error !== null) {
     if (error.status === 429) {
@@ -95,14 +85,21 @@ export const login = async (
         <span>Too many requests! Try again later.</span>
       );
       return;
+    } else if (error.message === "Email not confirmed") {
+      setLoginIncorrectContent(<span>Please check your inbox for a confirmation email.</span>)
     } else if (
-      error.code === "invalid_credentials" ||
-      error.name === "AuthApiError"
+      error.message === "Invalid login credentials"
     ) {
       setLoginIncorrectContent(
         <span>Your email or password is incorrect.</span>
       );
       return;
+    } else {
+      setLoginIncorrectContent(
+        <span>
+          An {error.name} occured. (Code {error.code}, Message {error.message})
+        </span>
+      );
     }
   } else {
     setTimeout(() => {
@@ -113,6 +110,8 @@ export const login = async (
       )}`;
     }, 500);
   }
+
+  return {data,error}
 };
 
 

@@ -1,0 +1,166 @@
+/* Dropdown component */
+
+.dropdown,
+.text-input-container {
+  position: relative;
+}
+
+.dropdown > .dropdown-head > button {
+  font-size: 12pt;
+  background-color: var(--section-background);
+  border: 1px solid var(--section-border-2);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.dropdown > .dropdown-head > button > span,
+.dropdown > .dropdown-body > button > span,
+.input-autocomplete-results > button > span {
+  flex: 1 0;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--main-text-color);
+}
+
+.dropdown > .dropdown-head > button > img {
+  height: 24px;
+  transform: rotate(90deg);
+}
+
+.dropdown.open > .dropdown-head > button > img {
+  height: 24px;
+  transform: rotate(-90deg);
+}
+
+.dropdown > .dropdown-body,
+.input-autocomplete-results {
+  position: absolute;
+  transform: translateY(8px);
+  display: flex;
+  flex-direction: column;
+  max-height: 250px;
+  overflow-y: scroll;
+  border-radius: 12px;
+  border: 1px solid var(--section-border-2);
+  width: 100%;
+  z-index: 2;
+  background-color: var(--section-background);
+}
+
+.input-autocomplete-results {
+  transform: translateY(56px) translateX(-1px);
+}
+
+.dropdown > .dropdown-body > button,
+.input-autocomplete-results > button {
+  flex: 0 0 fit-content;
+  font-size: 12pt;
+  background-color: var(--section-background);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 0;
+  width: 100%;
+  cursor: pointer;
+}
+
+.dropdown > .dropdown-body > button:focus,
+.input-autocomplete-results > button:focus {
+  outline: 2px solid var(--color-accent-0);
+  z-index: 1;
+}
+
+.dropdown > .dropdown-body > button:not(:first-child),
+.input-autocomplete-results > button:not(:first-child) {
+  border-top: 1px solid var(--section-border-2);
+}
+
+.dropdown > .dropdown-body > button:hover,
+.dropdown > .dropdown-body > button.active,
+.input-autocomplete-results > button:hover,
+.input-autocomplete-results > button:active {
+  background-color: var(--table-cell-hover);
+}
+
+/* Slider component */
+input[type="range"] {
+  position: relative;
+  width: 100%;
+  top: 0;
+  transform: translateY(-50%);
+  background: none;
+  pointer-events: none;
+  appearance: none;
+  height: 5px;
+}
+
+.slider-track {
+  height: 5px;
+  position: relative;
+  background-color: var(--garf-color);
+  left: 0;
+  right: 100%;
+  border-radius: 12px;
+  transform: translateY(14px);
+}
+
+input[type="range"]::-webkit-slider-thumb,
+input[type="range"]::-moz-range-thumb {
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: var(--section-background);
+  pointer-events: auto;
+  appearance: none;
+  cursor: pointer;
+  box-shadow: 0 0.125rem 0.5625rem -0.125rem rgba(0, 0, 0, 0.25);
+  position: relative;
+  z-index: 2;
+  transform: translateX(-2px);
+}
+
+.no-access input[type="range"]::-webkit-slider-thumb,
+.no-access input[type="range"]::-moz-range-thumb {
+  pointer-events: none;
+}
+
+.slider-input {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.slider-input-label {
+  text-align: center;
+}
+
+.dual-range-input-label label {
+  margin-right: 0;
+}
+
+.text-input-container {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  border-radius: 12px;
+}
+
+.text-input-container > input {
+  flex-grow: 1;
+}

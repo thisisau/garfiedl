@@ -1,0 +1,212 @@
+-- Test if username exists function
+create
+or replace function username_exists (username_new TEXT) returns boolean
+set
+  search_path = '' as $$ BEGIN
+return EXISTS(SELECT 1 FROM public.profiles WHERE LOWER(display_name) = LOWER(username_new)); END; $$ language plpgsql security DEFINER;
+
+-- Create profile for new user function
+create
+or replace function public.create_profile_for_new_user () returns trigger
+set
+  search_path = '' as $$
+ BEGIN
+  INSERT INTO public.profiles (id, display_name)
+  VALUES (NEW.id, public.generate_username(NEW.email));
+  RETURN NEW;
+ END; $$ language plpgsql security definer;
+
+
+-- Change username function
+create or replace function public.change_username(user_id TEXT, new_username TEXT) returns null
+declare
+  username_is_bad boolean;
+  id_is_good boolean;
+ begin $$
+  SELECT public.username_exists(new_username) INTO username_is_bad;
+
+  IF username_is_bad then
+   RAISE EXCEPTION SQLSTATE '90109' USING MESSAGE = 'This username is already in use!';
+  end IF;
+
+  IF length(new_username) > 16 or length(new_username) < 3 or new_username ~ '[^a-zA-Z0-9_-]|^[-_]|[-_]$|[-_]{2}' then
+   RAISE EXCEPTION SQLSTATE '90110' USING MESSAGE = 'Username does not follow the given criteria';
+  end IF;
+
+  SELECT EXISTS(SELECT 1 FROM public.profiles WHERE id = user_id) INTO id_is_good;
+  IF not id_is_good then
+   RAISE EXCEPTION SQLSTATE '90111' using MESSAGE = 'Couldn''t find a user ID.';
+  end IF;
+
+  UPDATE public.profiles
+  SET display_name = new_username
+  WHERE id = user_id;
+ end; $$ language plpgsql security definer;
+
+-- Upload garf function
+create or replace function public.upload_comic()
+returns text
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  locator uuid;
+begin
+  if not auth.role() = 'authenticated' then
+    raise exception sqlstate '90112' using message = 'You must be signed in to upload a comic!';
+  end if;
+
+  if exists(select 1 from public.profiles where id = auth.uid() and posts_banned = TRUE) then
+    raise exception sqlstate '90113' using message = 'You are not allowed to post new comics.';
+  end if;
+
+  locator := gen_random_uuid();
+
+  insert into public.comics (created_by, locator)
+  values (auth.uid(), locator);
+
+  return locator::text;
+end;
+$$;
+
+-- Function which counts the number of liked posts
+create or replace function public.count_likes(post_id int8)
+returns int8
+set
+  search_path = ''
+language plpgsql
+security invoker
+as $$
+begin
+  SELECT reltuples::bigint AS estimate
+  FROM pg_class
+  WHERE oid = 'public.posts_likes'::regclass AND
+  posts_likes.post = post_id;
+end;
+$$;
+
+-- Like post
+create or replace function increment_likes()
+returns trigger
+set search_path = ''
+language plpgsql
+security definer as
+$$
+begin
+  update public.posts
+  set likes = likes + 1
+  where NEW.post = id;
+  return NEW;
+end;
+$$;
+
+-- Unlike post
+create or replace function decrement_likes()
+returns trigger
+set search_path = ''
+language plpgsql
+security definer as
+$$
+begin
+  update public.posts
+  set likes = likes - 1
+  where OLD.post = id and likes > 0;
+  return OLD;
+end;
+$$;
+
+
+CREATE TRIGGER post_like_trigger AFTER INSERT ON public.posts_likes FOR EACH ROW EXECUTE PROCEDURE increment_likes();
+CREATE TRIGGER post_unlike_trigger BEFORE DELETE ON public.posts_likes FOR EACH ROW EXECUTE PROCEDURE decrement_likes();
+
+-- Get user info as regular user
+create
+or replace function get_user_info (user_id uuid) returns json
+set
+  search_path = '' language sql security definer as $$
+  select coalesce(
+    (
+      select json_build_object(
+    'id', id,
+    'display_name', display_name
+  ) FROM public.profiles where id = user_id
+    ),
+    json_build_object(
+      'id', user_id,
+      'display_name', 'Unknown User'
+    )
+  )
+$$;
+
+-- Reply post
+create
+or replace function increment_replies () returns trigger
+set
+  search_path = '' language plpgsql security definer as $$
+begin
+  update public.posts
+  set replies = replies + 1
+  where NEW.reference = id;
+  return NEW;
+end;
+$$;
+
+-- Unreply post
+create
+or replace function decrement_replies () returns trigger
+set
+  search_path = '' language plpgsql security definer as $$
+begin
+  update public.posts
+  set replies = replies - 1
+  where OLD.reference = id and replies > 0;
+  return OLD;
+end;
+$$;
+
+CREATE TRIGGER post_reply_trigger
+AFTER INSERT ON public.posts FOR EACH ROW WHEN (NEW.type = 'reply')
+EXECUTE PROCEDURE increment_replies ();
+
+CREATE TRIGGER post_unreply_trigger BEFORE DELETE ON public.posts FOR EACH ROW WHEN (OLD.type = 'reply')
+EXECUTE PROCEDURE decrement_replies ();
+
+create
+or replace function post_is_liked (post_id int8)
+returns boolean
+security invoker
+language sql
+set search_path = ''
+as $$
+  select EXISTS(SELECT 1 from public.posts_likes WHERE auth.uid() = posts_likes."user" AND posts_likes.post = post_id)
+$$;
+
+create
+or replace function
+report_post (post_id int8, report_body text)
+returns void
+security definer
+language plpgsql
+set search_path = ''
+as $$
+declare
+  now_timestamp TIMESTAMP;
+  report_cutoff TIMESTAMP;
+begin
+  now_timestamp := NOW();
+  report_cutoff := now_timestamp - INTERVAL '15 minutes';
+
+  IF (
+    SELECT COUNT(*)
+    FROM public.posts_reports
+    WHERE posts_reports.created_at > report_cutoff
+    and posts_reports.submitted_by = auth.uid()
+  ) >= 10 then
+    RAISE EXCEPTION SQLSTATE '90114' using message = 'Please wait a few minutes before submitting another report.';
+  end if;
+
+  insert into public.posts_reports (reference, body)
+  values (post_id, report_body);
+end;
+$$;

@@ -123,18 +123,22 @@ secure_password_change = false
 max_frequency = "1s"
 
 # Use a production-ready SMTP server
- [auth.email.smtp]
- host = "smtp.resend.com"
- port = 465
- user = "resend"
- pass = "env(RESEND_SECRET)"
- admin_email = "auth-noreply-dev-email@mail.garfiedl.com"
- sender_name = "Garfiedl.com[DEV]"
+[auth.email.smtp]
+host = "smtp.resend.com"
+port = 465
+user = "resend"
+pass = "env(RESEND_SECRET)"
+admin_email = "auth-noreply@mail.garfiedl.com"
+sender_name = "Garfiedl.com"
 
 # Uncomment to customize email template
- [auth.email.template.invite]
- subject = "Confirm your Signup"
- content_path = "./supabase/templates/invite.html"
+#  [auth.email.template.invite]
+#  subject = "Confirm your Signup"
+#  content_path = "./supabase/templates/invite.html"
+
+[auth.email.template.confirmation]
+subject = "Your Email Confirmation Code"
+content_path = "./supabase/templates/email_confirmation.html"
 
 [auth.sms]
 # Allow/disallow new user signups via SMS to your project.
