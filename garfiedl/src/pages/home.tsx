@@ -1,4 +1,5 @@
 import MainHeader from "../components/header";
+import NavPanel from "../components/nav_panel";
 import PostViewer from "../components/post";
 import PostCreator from "../components/post_creator";
 
@@ -8,9 +9,8 @@ export default function Home() {
       <MainHeader />
       <div className="content">
         <div className="home-panels">
+          <NavPanel />
           <div className="center-panel">
-            <PostCreator />
-            <hr className="gray" />
             <PostViewer />
           </div>
         </div>

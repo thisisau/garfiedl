@@ -21,8 +21,9 @@ import { useSession } from "../supabase/hooks";
 import { concatClasses, formatDate, simpleHash } from "../functions/functions";
 import { Dropdown } from "./input/dropdown";
 import { ReportPost } from "./report";
+import { InfiniteElementList } from "./list";
 
-export default function PostList() {
+export default function MainPostList() {
   const [posts, updatePosts] = useStateObj<Array<Post>>([]);
 
   async function fetchPosts(): Promise<Array<Post>> {
@@ -54,9 +55,20 @@ export default function PostList() {
 
   return (
     <div className="post-list">
-      {posts.map((post, i) => (
-        <PostPreview key={i} post={post} />
-      ))}
+      <InfiniteElementList
+        itemsPerLoad={5}
+        loadItems={async (start, count) => {
+          const { data, error } = await supabase
+            .from("posts")
+            .select()
+            .in("type", ["post", "repost", "quote"])
+            .order("likes", { ascending: false })
+            .range(start, start + count - 1);
+          if (error) throw error;
+          if (data === null) return [];
+          return data.map((e) => <PostPreview post={e} />);
+        }}
+      />
     </div>
   );
 }
@@ -374,7 +386,9 @@ export function PostPreview(props: {
           }}
           tabIndex={0}
         >
-          {post.body || <span className="empty-body">This post has no text.</span>}
+          {post.body || (
+            <span className="empty-body">This post has no text.</span>
+          )}
         </div>
 
         {post.comic && <OnlineComic id={post.comic} />}
@@ -385,7 +399,9 @@ export function PostPreview(props: {
         )}
         {post.reference !== null &&
           ((post.type === "quote" && referenceStack.length <= 1) ||
-            (post.type === "quote" && props.displayData?.repost && referenceStack.length <= 2)) && (
+            (post.type === "quote" &&
+              props.displayData?.repost &&
+              referenceStack.length <= 2)) && (
             <div className="quote">
               <OnlinePost
                 postID={post.reference}

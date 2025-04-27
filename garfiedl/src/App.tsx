@@ -19,9 +19,11 @@ import "./css/input.css";
 import "./css/editor.css";
 import "./css/post.css";
 import "./css/home.css";
+import "./css/nav_panel.css";
 
 import { dotPulse } from "ldrs";
 import SinglePost from "./components/post_viewer";
+import UserProfile from "./pages/user_profile";
 dotPulse.register();
 
 function App() {
@@ -41,6 +43,7 @@ function App() {
             <Route path="/signup/after" element={<AfterSignup />}></Route>
             <Route path="/account" element={<Account />}></Route>
             <Route path="/post/:postID" element={<SinglePost />} />
+            <Route path="/user/:username" element={<UserProfile />} />
             <Route path="*" element={<NotFound />}></Route>
             <Route path="/test-stuff" element={<TestStuff />}></Route>
           </Routes>

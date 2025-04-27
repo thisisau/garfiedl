@@ -8,18 +8,18 @@ import { Post } from "../types/posts";
  */
 export async function getReplies(
   postID: number,
-  options?: {
-    start?: number;
-    end?: number;
-    order?: "popular" | "recent";
+  options: {
+    start: number;
+    count: number;
+    order: "popular" | "recent";
   }
 ): Promise<Array<Post>> {
-  const start = options?.start ?? 0;
-  const end = options?.end ?? 1_000;
+  const start = options.start;
+  const count = options.count;
 
   let filter = supabase.from("posts").select();
-  filter = filter.eq("type", "reply").eq("reference", postID)
-  if (options?.order === "popular")
+  filter = filter.eq("type", "reply").eq("reference", postID);
+  if (options.order === "popular")
     filter = filter.order("likes", { ascending: false, nullsFirst: false });
   else
     filter = filter.order("created_at", {
@@ -27,19 +27,17 @@ export async function getReplies(
       nullsFirst: false,
     });
 
-  filter = filter.range(start, end);
+  filter = filter.range(start, start + count - 1);
 
-  const {data, error} = await filter;
+  const { data, error } = await filter;
 
   if (error) throw error;
   return data;
 }
 
-export async function getPost(
-  postID: number
-) {
-  const {data, error} = await supabase.from("posts").select().eq("id", postID);
+export async function getPost(postID: number) {
+  const { data } = await supabase.from("posts").select().eq("id", postID);
   if (data === null) return null;
   else if (data.length === 0) return null;
   return data[0];
-};
+}

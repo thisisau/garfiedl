@@ -6,18 +6,21 @@ import supabase from "../supabase/client";
 import { getPost, getReplies } from "../functions/post";
 import { filterProps } from "framer-motion";
 import { LinkIconWithTooltip } from "./tooltip";
+import MainHeader from "./header";
+import { InfiniteElementList } from "./list";
 
 export default function PostViewer() {
   const params = useParams();
   const navigate = useNavigate();
   return (
     <div id="page-container">
+      <MainHeader />
       <div className="content">
         <div className="home-panels">
           <div className="center-panel">
             <div className="nav-header section">
               <LinkIconWithTooltip
-              tooltip="Back"
+                tooltip="Back"
                 className="icon-container"
                 to={"/"}
                 onClick={(e) => {
@@ -27,7 +30,7 @@ export default function PostViewer() {
                   setTimeout(() => {
                     const afterLocation = window.location.href;
                     if (beforeLocation === afterLocation) navigate("/");
-                  }, 100)
+                  }, 100);
                 }}
                 src="/icons/arrow-left.svg"
               />
@@ -165,28 +168,23 @@ export function PostReplies(props: {
   start?: number;
   end?: number;
 }) {
-  const [replies, setReplies] = useState<Array<Post>>([]);
-
-  useEffect(() => {
-    getReplies(props.postID, { start: props.start, end: props.end, order: "popular" }).then(
-      (e) => {
-        console.log(e);
-        setReplies(e);
-      }
-    );
-  }, [props.postID, props.start, props.end]);
-
-  if (replies.length === 0) {
-    return <></>;
-  }
-
   return (
     <div className="reply-list">
-      {replies.map((e, i) => (
-        <div className="reply-chain">
-          <RecursiveReplyViewer maxDepth={3} post={e} key={i} reverse={false} />
-        </div>
-      ))}
+      <InfiniteElementList
+        itemsPerLoad={5}
+        loadItems={async (start, count) => {
+          const replies = await getReplies(props.postID, {
+            start,
+            count,
+            order: "recent",
+          });
+          return replies.map((e) => (
+            <div className="reply-chain">
+              <RecursiveReplyViewer maxDepth={3} post={e} reverse={false} />
+            </div>
+          ));
+        }}
+      />
     </div>
   );
 }
@@ -205,7 +203,7 @@ export function RecursiveReplyViewer(props: {
     if (!props.reverse) {
       getReplies(props.post.id, {
         start: 0,
-        end: 0,
+        count: 1,
         order: "popular",
       }).then((replies) => {
         if (replies.length === 0) return;

@@ -236,6 +236,12 @@ export type Database = {
         }
         Returns: string
       }
+      get_user_id: {
+        Args: {
+          username: string
+        }
+        Returns: string
+      }
       get_user_info: {
         Args: {
           user_id: string

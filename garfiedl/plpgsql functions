@@ -210,3 +210,66 @@ begin
   values (post_id, report_body);
 end;
 $$;
+
+create or replace function
+get_user_id (username text)
+returns uuid
+security definer
+language sql
+set search_path = ''
+as $$
+  select id from public.profiles where display_name = username
+$$;
+
+-- Unreply post
+create
+or replace function decrement_replies () returns trigger
+set
+  search_path = '' language plpgsql security definer as $$
+begin
+  update public.posts
+  set replies = replies - 1
+  where OLD.reference = id and replies > 0;
+  return OLD;
+end;
+$$;
+
+-- Follow user
+create
+or replace function increment_follows () returns trigger
+set
+  search_path = '' language plpgsql security definer as $$
+begin
+  update public.profiles
+  set following_count = following_count + 1
+  where NEW.author = id;
+  update public.profiles
+  set follower_count = follower_count + 1
+  where NEW.recipient = id;
+  return NEW;
+end;
+$$;
+
+-- Unfollow user
+create
+or replace function decrement_follows () returns trigger
+set
+  search_path = '' language plpgsql security definer as $$
+begin
+  update public.profiles
+  set following_count = following_count - 1
+  where OLD.author = id;
+  update public.profiles
+  set follower_count = follower_count - 1
+  where OLD.recipient = id;
+  return OLD;
+end;
+$$;
+
+CREATE TRIGGER user_follow_trigger
+AFTER INSERT ON public.follows FOR EACH ROW
+EXECUTE PROCEDURE increment_follows ();
+
+CREATE TRIGGER user_unfollow_trigger
+BEFORE DELETE ON public.follows FOR EACH ROW
+EXECUTE PROCEDURE decrement_follows ();
