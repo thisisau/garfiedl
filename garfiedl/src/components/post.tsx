@@ -6,10 +6,7 @@ import { useAddAlert } from "./alerts/alert_hooks";
 import Button from "./input/button";
 import { Modal } from "./modal";
 import { UUID } from "crypto";
-import {
-  Link,
-  useNavigate,
-} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ComicViewer from "./comic_viewer";
 import { Comic } from "../types/sprites";
 import { DEFAULT_COMIC, useOpenPostDraft } from "./post_creator";
@@ -59,6 +56,7 @@ export function PostPreview(props: {
     : [post.id];
 
   const session = useSession();
+  const loggedIn = !!session?.data.user;
 
   const [liked, setLiked] = useState(false);
 
@@ -388,9 +386,13 @@ export function PostPreview(props: {
                     ? `/icons/heart-like-solid.svg`
                     : `/icons/heart-like.svg`
                 }
-                className="icon-container"
+                className={concatClasses(
+                  "icon-container",
+                  !loggedIn && "no-access"
+                )}
                 tooltip="Like"
                 onClick={async () => {
+                  if (!loggedIn) return;
                   setLiked(!liked);
                   if (liked) {
                     const userID = session?.data.user?.id;
@@ -415,9 +417,13 @@ export function PostPreview(props: {
             <div>
               <LinkIconWithTooltip
                 src={`/icons/arrow-back.svg`}
-                className="icon-container"
+                className={concatClasses(
+                  "icon-container",
+                  !loggedIn && "no-access"
+                )}
                 tooltip="Reply"
                 onClick={() => {
+                  if (!loggedIn) return;
                   openPostDraft({ mode: "reply", reference: post.id });
                 }}
               />
@@ -426,9 +432,13 @@ export function PostPreview(props: {
             <div>
               <LinkIconWithTooltip
                 src={`/icons/recycle.svg`}
-                className="icon-container"
+                className={concatClasses(
+                  "icon-container",
+                  !loggedIn && "no-access"
+                )}
                 tooltip="ReGarf"
                 onClick={() => {
+                  if (!loggedIn) return;
                   addAlert((clearAlert) => (
                     <Modal title="Confirm ReGarf">
                       <div>
@@ -458,11 +468,12 @@ export function PostPreview(props: {
             <div>
               <LinkIconWithTooltip
                 src={`/icons/user-cough.svg`}
-                className="icon-container"
+                className={concatClasses("icon-container", !loggedIn && "no-access")}
                 tooltip="Quote"
-                onClick={() =>
-                  openPostDraft({ mode: "quote", reference: post.id })
-                }
+                onClick={() => {
+                  if (!loggedIn) return;
+                  openPostDraft({ mode: "quote", reference: post.id });
+                }}
               />
             </div>
           </div>
@@ -544,7 +555,7 @@ function OnlineComic(props: { id: string }) {
                   width: "calc(100vw - 2px)",
                   height: "calc(100vh - 2px)",
                   objectFit: "contain",
-                  borderColor: "transparent"
+                  borderColor: "transparent",
                 }}
               ></ComicViewer>
             </div>
@@ -552,7 +563,7 @@ function OnlineComic(props: { id: string }) {
         }}
         tabIndex={0}
         style={{
-          cursor: "pointer"
+          cursor: "pointer",
         }}
       >
         <ComicViewer comic={comic} />
