@@ -1,20 +1,13 @@
 import { useStateObj } from "../functions/hooks";
-import {
-  DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES,
-  useRef,
-  useState,
-} from "react";
 import { TextInput } from "./input/input";
 import { LinkIconWithTooltip } from "./tooltip";
 import ComicEditor from "./comic_editor";
 import { Comic } from "../types/sprites";
 import ComicViewer from "./comic_viewer";
 import { concatClasses, toTitle } from "../functions/functions";
-import { addScaleCorrector } from "framer-motion";
 import { useAddAlert, useClearAlertID } from "./alerts/alert_hooks";
 import { Modal } from "./modal";
 import supabase from "../supabase/client";
-import { PostgrestSingleResponse } from "@supabase/supabase-js";
 import Button from "./input/button";
 import { useNavigate } from "react-router-dom";
 

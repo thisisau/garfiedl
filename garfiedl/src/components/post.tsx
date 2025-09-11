@@ -2,20 +2,17 @@ import { useEffect, useState } from "react";
 import { useStateObj } from "../functions/hooks";
 import supabase from "../supabase/client";
 import { Post, PostDisplayData } from "../types/posts";
-import { useAddAlert, useClearAlertID } from "./alerts/alert_hooks";
+import { useAddAlert } from "./alerts/alert_hooks";
 import Button from "./input/button";
 import { Modal } from "./modal";
 import { UUID } from "crypto";
 import {
   Link,
-  redirect,
-  useLocation,
   useNavigate,
-  useParams,
 } from "react-router-dom";
 import ComicViewer from "./comic_viewer";
 import { Comic } from "../types/sprites";
-import PostCreator, { DEFAULT_COMIC, useOpenPostDraft } from "./post_creator";
+import { DEFAULT_COMIC, useOpenPostDraft } from "./post_creator";
 import { ElementWithTooltip, LinkIconWithTooltip } from "./tooltip";
 import { useSession } from "../supabase/hooks";
 import { concatClasses, formatDate, simpleHash } from "../functions/functions";

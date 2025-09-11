@@ -1,6 +1,3 @@
-import { useEffect } from "react";
-import MainHeader from "../components/header";
-import { useNavigate } from "react-router-dom";
 import NavPanel from "../components/nav_panel";
 
 export default function NotFound() {

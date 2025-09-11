@@ -1,4 +1,3 @@
-import { ReactNode } from "react";
 import { useClearAlert } from "./alerts/alert_hooks";
 
 export function Modal(props: {

@@ -1,8 +1,6 @@
 import { ReactNode, useEffect, useState } from "react";
 import Button from "../components/input/button";
-import MainHeader from "../components/header";
 import { useStateObj } from "../functions/hooks";
-import { logout } from "../functions/login_manager";
 import supabase from "../supabase/client";
 import { useSession } from "../supabase/hooks";
 import { useAddAlert } from "../components/alerts/alert_hooks";
@@ -106,7 +104,7 @@ const UsernameChangeDialog = () => {
               keys.push(localStorage.key(i));
             }
             const emailKeys = keys
-              .map((e, i) => localStorage.key(i))
+              .map((_, i) => localStorage.key(i))
               .filter((e) => e?.startsWith("auth-email-"))
               .filter((e) => e !== null);
 

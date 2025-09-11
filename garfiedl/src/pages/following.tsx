@@ -1,9 +1,7 @@
-import { PostgrestError } from "@supabase/supabase-js";
 import { InfiniteElementList } from "../components/list";
 import NavPanel from "../components/nav_panel";
 import { PostPreview } from "../components/post";
 import supabase from "../supabase/client";
-import { Database } from "../supabase/database.types";
 import { Post } from "../types/posts";
 
 export default function Following() {

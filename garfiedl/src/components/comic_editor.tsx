@@ -1,7 +1,5 @@
 import {
   createContext,
-  createElement,
-  Fragment,
   useContext,
   useEffect,
   useMemo,
@@ -13,15 +11,12 @@ import {
   Comic,
   spriteCache,
   spritesList,
-  SpriteTransformations,
 } from "../types/sprites";
 import ComicViewer, { createImageAndWaitForLoad } from "./comic_viewer";
 import { DropdownInput, TextInput } from "./input/input";
 import {
-  capitalizeFirstLetter,
   concatClasses,
   pointOperators,
-  toTitle,
 } from "../functions/functions";
 import Button from "./input/button";
 import { Slider } from "./input/slider";

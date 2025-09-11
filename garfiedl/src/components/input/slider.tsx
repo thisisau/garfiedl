@@ -1,5 +1,4 @@
 import { ChangeEventHandler, useRef, useState } from "react";
-import { TextInput } from "./input";
 
 export function Slider(props: {
   min: number;

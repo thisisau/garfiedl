@@ -1,9 +1,8 @@
-import { MouseEventHandler } from "react";
 import { useStateObj } from "../functions/hooks";
 import { Post } from "../types/posts";
 import Button from "./input/button";
 import { TextInput } from "./input/input";
-import { OnlinePost, PostPreview, SimplePost } from "./post";
+import { SimplePost } from "./post";
 
 export function ReportPost(props: {
   post: Post;

@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from "react";
+import { ReactNode } from "react";
 import { isValidEmail, isValidPassword } from "../supabase/authentication";
 import supabase from "../supabase/client";
 import { SignOut } from "@supabase/supabase-js";
@@ -54,7 +54,7 @@ export const signup = async (
     }
   }
 
-  return {data,error}
+  return { data, error };
 };
 
 export const login = async (
@@ -86,10 +86,10 @@ export const login = async (
       );
       return;
     } else if (error.message === "Email not confirmed") {
-      setLoginIncorrectContent(<span>Please check your inbox for a confirmation email.</span>)
-    } else if (
-      error.message === "Invalid login credentials"
-    ) {
+      setLoginIncorrectContent(
+        <span>Please check your inbox for a confirmation email.</span>
+      );
+    } else if (error.message === "Invalid login credentials") {
       setLoginIncorrectContent(
         <span>Your email or password is incorrect.</span>
       );
@@ -111,10 +111,9 @@ export const login = async (
     }, 500);
   }
 
-  return {data,error}
+  return { data, error };
 };
-
 
 export const logout = (options?: SignOut) => {
   supabase.auth.signOut(options);
-}
+};

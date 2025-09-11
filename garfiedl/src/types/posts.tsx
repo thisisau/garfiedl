@@ -1,5 +1,3 @@
-import { UUID } from "crypto";
-
 export type Post = {
   id: number;
   created_at: string;

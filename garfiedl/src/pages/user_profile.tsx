@@ -1,14 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { LinkIconWithTooltip } from "../components/tooltip";
-import { Fragment, ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import supabase from "../supabase/client";
 import type { UUID } from "crypto";
-import MainHeader from "../components/header";
 import { useStateObj } from "../functions/hooks";
-import { concatClasses, plural, simpleHash } from "../functions/functions";
-import { Post } from "../types/posts";
+import { plural, simpleHash } from "../functions/functions";
 import { PostPreview } from "../components/post";
-import Button from "../components/input/button";
 import { InfiniteElementList } from "../components/list";
 import { useSession } from "../supabase/hooks";
 import NavPanel from "../components/nav_panel";

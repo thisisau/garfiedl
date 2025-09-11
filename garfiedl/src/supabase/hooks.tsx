@@ -1,4 +1,4 @@
-import { AuthError, Session, SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseClient } from "@supabase/supabase-js";
 import supabase from "./client";
 import { useEffect, useMemo, useState } from "react";
 

@@ -1,4 +1,4 @@
-import { CSSProperties, DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes, useEffect, useRef, useState } from "react";
+import { DetailedHTMLProps, HTMLAttributes, InputHTMLAttributes, ReactNode, TextareaHTMLAttributes, useEffect, useRef, useState } from "react";
 import { concatClasses } from "../../functions/functions";
 
 export type InputComponentCallback<T> = (

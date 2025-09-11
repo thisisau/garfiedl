@@ -79,7 +79,7 @@ export function Dropdown(props: {
       ) : (
         <div
           className="dropdown-head"
-          onClick={(e) => {
+          onClick={() => {
             setIsOpen(!isOpen);
           }}
         >

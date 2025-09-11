@@ -107,7 +107,7 @@ export default function AfterSignup(props: {
                   );
                   return;
                 }
-                const { data, error } = await supabase.auth.verifyOtp({
+                const { error } = await supabase.auth.verifyOtp({
                   email: email.current,
                   token: info.verificationCode,
                   type: "email",

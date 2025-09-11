@@ -1,7 +1,4 @@
-import { UUID } from "crypto";
 import { ClassArray } from "./types";
-import { SupabaseAuthClient } from "@supabase/supabase-js/dist/module/lib/SupabaseAuthClient";
-import supabase from "../supabase/client";
 
 export function concatClasses(...classes: ClassArray): string {
   return classes

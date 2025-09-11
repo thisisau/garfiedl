@@ -4,7 +4,6 @@ import { PostPreview } from "./post";
 import { useEffect, useState } from "react";
 import supabase from "../supabase/client";
 import { getPost, getReplies } from "../functions/post";
-import { filterProps } from "framer-motion";
 import { LinkIconWithTooltip } from "./tooltip";
 import { InfiniteElementList } from "./list";
 import NavPanel from "./nav_panel";
