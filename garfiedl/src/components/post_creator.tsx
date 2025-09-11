@@ -151,7 +151,7 @@ export default function PostCreator(props: {
           className="icon-container"
           src="/icons/send.svg"
           tooltip="Post!"
-          linkProps={{ style: { marginLeft: view.link === "none" && "auto" } }}
+          linkProps={{ style: { marginLeft: view.link === "none" ? "auto" : undefined } }}
           onClick={async () => {
             if (view.comic === "editor") {
               addAlert(

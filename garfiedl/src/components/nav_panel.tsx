@@ -146,7 +146,7 @@ function NavOption(props: {
   return (
     <Link
       className="nav-option"
-      to={props.to}
+      to={props.to ?? "./"}
       target={props.target}
       onClick={props.onClick}
     >
