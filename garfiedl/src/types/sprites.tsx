@@ -226,9 +226,10 @@ export function drawOnCanvas(
   }
 }
 
-export const spritesList: Sprites = await (
-  await fetch("/sprites/custom/sprites.json")
-).json();
+export let spritesList: Sprites;
+
+fetch("/sprites/custom/sprites.json").then(e => e.json().then(ee => spritesList = ee))
+
 
 export const spriteCache: {
   [i in `${Characters}-${number}`]: {
