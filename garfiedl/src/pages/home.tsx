@@ -6,7 +6,6 @@ import PostCreator from "../components/post_creator";
 export default function Home() {
   return (
     <div id="page-container">
-      <MainHeader />
       <div className="content">
         <div className="home-panels">
           <NavPanel />

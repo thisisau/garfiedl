@@ -24,49 +24,18 @@ import { ReportPost } from "./report";
 import { InfiniteElementList } from "./list";
 
 export default function MainPostList() {
-  const [posts, updatePosts] = useStateObj<Array<Post>>([]);
-
-  async function fetchPosts(): Promise<Array<Post>> {
-    const posts = await supabase
-      .from("posts")
-      .select()
-      .in("type", ["post", "repost", "quote"])
-      .order("likes", { ascending: false });
-    // .filter(
-    //   "created_at",
-    //   "gt",
-    //   new Date(
-    //     new Date().getTime() - 1000 * 60 * 60 * 24 * 3 /* 3 days */
-    //   ).toUTCString()
-    // );
-    if (posts.error) return [];
-    return posts.data;
-  }
-
-  useEffect(() => {
-    fetchPosts().then((res) =>
-      updatePosts((posts) =>
-        res.forEach((e) => {
-          if (!posts.some((post) => post.id === e.id)) posts.push(e);
-        })
-      )
-    );
-  }, []);
-
   return (
     <div className="post-list">
       <InfiniteElementList
         itemsPerLoad={5}
         loadItems={async (start, count) => {
           const { data, error } = await supabase
-            .from("posts")
+            .from("suggested_posts")
             .select()
-            .in("type", ["post", "repost", "quote"])
-            .order("likes", { ascending: false })
             .range(start, start + count - 1);
           if (error) throw error;
           if (data === null) return [];
-          return data.map((e) => <PostPreview post={e} />);
+          return data.map((e) => <PostPreview post={e as Post} />);
         }}
       />
     </div>
@@ -173,8 +142,8 @@ export function PostPreview(props: {
           <span>?</span>
         ) : (
           <img
-            src={`/sprites/copyright_issue/animals/${
-              simpleHash(author.id ?? "Unknown User") % 24
+            src={`/sprites/custom/garfiedl/${
+              simpleHash(author.id ?? "Unknown User") % 6
             }.svg`}
           />
         )}
@@ -555,6 +524,8 @@ export function OnlinePost(props: {
 function OnlineComic(props: { id: string }) {
   const [comic, setComic] = useState<Comic | undefined>(undefined);
 
+  const addAlert = useAddAlert();
+
   useEffect(() => {
     const { data } = supabase.storage
       .from("default")
@@ -565,7 +536,28 @@ function OnlineComic(props: { id: string }) {
 
   if (comic !== undefined)
     return (
-      <div className="comic">
+      <div
+        className="comic"
+        onClick={() => {
+          addAlert((clear) => (
+            <div className="modal" onClick={clear}>
+              <ComicViewer
+                comic={comic}
+                style={{
+                  width: "calc(100vw - 2px)",
+                  height: "calc(100vh - 2px)",
+                  objectFit: "contain",
+                  borderColor: "transparent"
+                }}
+              ></ComicViewer>
+            </div>
+          ));
+        }}
+        tabIndex={0}
+        style={{
+          cursor: "pointer"
+        }}
+      >
         <ComicViewer comic={comic} />
       </div>
     );
@@ -594,8 +586,8 @@ export function SimplePost(props: {
           <span>?</span>
         ) : (
           <img
-            src={`/sprites/copyright_issue/animals/${
-              simpleHash(props.author.id ?? "Unknown User") % 24
+            src={`/sprites/custom/garfiedl/${
+              simpleHash(props.author.id ?? "Unknown User") % 6
             }.svg`}
           />
         )}

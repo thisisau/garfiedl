@@ -8,12 +8,17 @@ import { useSession } from "../supabase/hooks";
 import { useAddAlert } from "../components/alerts/alert_hooks";
 import { Modal } from "../components/modal";
 import { TextInput } from "../components/input/input";
+import NavPanel from "../components/nav_panel";
+import { FormItem, FormItemWithTitle } from "../components/form";
+import { useNavigate } from "react-router-dom";
 
 export default function Account() {
   const session = useSession();
   const addAlert = useAddAlert();
 
-  const [info, setInfo] = useStateObj({ username: "" });
+  const [info, setInfo] = useStateObj({ username: "…" });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -27,34 +32,48 @@ export default function Account() {
 
   return (
     <div id="page-container">
-      <MainHeader />
-      I will make this page look good later
-      <br />
-      <div>
-        <Button onClick={() => logout({ scope: "local" })}>Log Out</Button>
-        <Button onClick={() => logout({ scope: "global" })}>
-          Evil Log Out (log out of all accounts)
-        </Button>
-        <Button onClick={() => logout({ scope: "others" })}>
-          Super Evil Log Out (log out of other accounts)
-        </Button>
-      </div>
-      <div>
-        <Button
-          onClick={() =>
-            addAlert(<Modal title="Change Username" flexibleHeight>
-                <UsernameChangeDialog />
-              </Modal>
-            )
-          }
-        >
-          Change Username
-        </Button>
-      </div>
-      <div>
-        <p>Account info(partially readable edition)</p>
-        <p>Email: {session?.data.user?.email}</p>
-        <p>Username: {info.username}</p>
+      <div className="content">
+        <div className="home-panels">
+          <NavPanel />
+          <div className="center-panel">
+            <h1 style={{ textAlign: "center" }}>User Info</h1>
+            <FormItem>Username: {info.username}</FormItem>
+            <FormItem>
+              Email: {session?.data?.user?.email ?? "Loading…"}
+            </FormItem>
+            <FormItemWithTitle title="Actions">
+              <Button
+                onClick={() =>
+                  supabase.auth
+                    .signOut({ scope: "local" })
+                    .then(() => navigate("/"))
+                }
+              >
+                Sign Out (this device)
+              </Button>
+              <Button
+                onClick={() =>
+                  supabase.auth
+                    .signOut({ scope: "global" })
+                    .then(() => navigate("/"))
+                }
+              >
+                Sign Out (all devices)
+              </Button>
+              <Button
+                onClick={() =>
+                  addAlert(
+                    <Modal title="Change Username" flexibleHeight>
+                      <UsernameChangeDialog />
+                    </Modal>
+                  )
+                }
+              >
+                Change Username
+              </Button>
+            </FormItemWithTitle>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -73,7 +92,7 @@ const UsernameChangeDialog = () => {
             className="username-editor"
             maxLength={16}
             textAlign="center"
-            placeholder="Add a username..."
+            placeholder="Add a username…"
             onUpdate={(val) => setInfo((e) => (e.username = val))}
             defaultValue={info.username}
           />

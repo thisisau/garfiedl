@@ -16,6 +16,7 @@ import { Modal } from "./modal";
 import supabase from "../supabase/client";
 import { PostgrestSingleResponse } from "@supabase/supabase-js";
 import Button from "./input/button";
+import { useNavigate } from "react-router-dom";
 
 export const DEFAULT_COMIC: Comic = {
   info: {
@@ -53,11 +54,7 @@ export const DEFAULT_COMIC: Comic = {
 };
 
 export default function PostCreator(props: {
-  onPost?: (post: {
-    link?: string;
-    comic?: string;
-    body: string;
-  }) => Promise<PostgrestSingleResponse<null>>;
+  onPost: (post: { link?: string; comic?: string; body: string }) => void;
   placeholder?: string;
 }) {
   const [post, updatePost] = useStateObj<{
@@ -84,7 +81,7 @@ export default function PostCreator(props: {
           defaultValue={post.body}
           onUpdate={(val) => updatePost((post) => (post.body = val))}
           maxLength={360}
-          placeholder={props.placeholder ?? "Type some text here..."}
+          placeholder={props.placeholder ?? "Type some text here…"}
         />
       </div>
       <div
@@ -129,16 +126,24 @@ export default function PostCreator(props: {
               />
             </div>
             <LinkIconWithTooltip
-              className="icon-container"
+              className={concatClasses(
+                "icon-container test-link",
+                !post.link && "no-access"
+              )}
               tooltip="Test link"
               src="/icons/external.svg"
               target="_blank"
-              to={
-                post.link &&
-                (/^https?:\/\//.test(post.link)
-                  ? post.link
-                  : `https://${post.link}`)
-              }
+              onClick={() => {
+                if (post.link)
+                  window
+                    .open(
+                      /^https?:\/\//.test(post.link)
+                        ? post.link
+                        : `https://${post.link}`,
+                      "_blank"
+                    )
+                    ?.focus();
+              }}
             />
           </>
         ) : (
@@ -208,25 +213,11 @@ export default function PostCreator(props: {
 
               locator = data;
             }
-            const res = props.onPost
-              ? await props.onPost({
-                  link,
-                  body,
-                  comic: locator,
-                })
-              : await supabase
-                  .from("posts")
-                  .insert(
-                    { link, body, comic: locator },
-                    { count: "estimated" }
-                  );
-            if (res.error) {
-              addAlert(
-                <Modal title="Error">
-                  A server error occured (3). Code {res.error.code}
-                </Modal>
-              );
-            }
+            props.onPost({
+              link,
+              body,
+              comic: locator,
+            });
           }}
         />
       </div>
@@ -280,6 +271,7 @@ export default function PostCreator(props: {
 export function useOpenPostDraft() {
   const addAlert = useAddAlert();
   const clearAlert = useClearAlertID();
+  const navigate = useNavigate();
 
   return (
     props:
@@ -291,12 +283,18 @@ export function useOpenPostDraft() {
           reference: number;
         }
   ) => {
+    const editorOpenedTimestamp = new Date().getTime();
     const alert = addAlert(
       <Modal
         title={toTitle(props.mode)}
         width={720}
         flexibleHeight
         onClose={() => {
+          // Don't prompt if the editor has been open for less than ten seconds
+          if (new Date().getTime() - editorOpenedTimestamp <= 10 * 1000) {
+            clearAlert(alert);
+            return;
+          }
           const alertConfirmation = addAlert(() => (
             <Modal title="Exit Draft">
               <div>
@@ -325,25 +323,42 @@ export function useOpenPostDraft() {
       >
         <PostCreator
           onPost={async (post) => {
-            if (props.mode === "post")
-              return await supabase.from("posts").insert({
-                ...post,
-                type: props.mode,
-              });
-            else
-              return await supabase.from("posts").insert({
-                ...post,
-                type: props.mode,
-                reference: props.reference,
-              });
+            const { data, error } =
+              props.mode === "post"
+                ? await supabase
+                    .from("posts")
+                    .insert({
+                      ...post,
+                      type: props.mode,
+                    })
+                    .select("id")
+                : await supabase.from("posts").insert({
+                    ...post,
+                    type: props.mode,
+                    reference: props.reference,
+                  }).select("id");
+
+              console.log("data is", data)
+
+            if (error) {
+              addAlert(
+                <Modal title="Error">
+                  A server error occured (3). Code {error.code}
+                </Modal>
+              );
+              return;
+            }
+
+            if (data && data.length) navigate(`/post/${data[0].id}`);
+            clearAlert(alert)
           }}
           placeholder={
             props.mode === "post"
               ? "What's up?"
               : props.mode === "reply"
-              ? "Add a reply..."
+              ? "Add a reply…"
               : props.mode === "quote"
-              ? "Add some groundbreaking commentary..."
+              ? "Add some groundbreaking commentary…"
               : ""
           }
         />

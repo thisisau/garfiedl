@@ -9,6 +9,7 @@ export function InfiniteElementList(props: {
     startIndex: number,
     itemCount: number
   ) => Promise<Array<ReactNode>>;
+  emptyMessage?: ReactNode
 }) {
   const [items, setItems] = useState<Array<ReactNode>>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +42,9 @@ export function InfiniteElementList(props: {
           {isLoading ? <l-dot-pulse color="white" /> : "More Posts"}
         </Button>
       )}
+      {
+        !isMoreItems && items.length === 0 && props.emptyMessage
+      }
     </>
   );
 }

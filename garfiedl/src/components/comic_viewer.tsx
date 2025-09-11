@@ -36,11 +36,14 @@ export default function ComicViewer(props: {
         if (panel.background !== undefined) {
           let image;
           const spriteID: `${Characters}-${number}` = `${panel.background.character}-${panel.background.index}`;
+
           if (Object.keys(spriteCache).includes(spriteID)) {
             image = spriteCache[spriteID].image;
           } else {
             image = await createImageAndWaitForLoad(
-              `/sprites/copyright_issue/${panel.background.character}/${panel.background.index}.svg`
+              `/sprites/custom/${panel.background.character}/${
+                panel.background.index
+              }.${spritesList.sprites[panel.background.character].extension}`
             );
             spriteCache[spriteID] = { image };
           }
@@ -67,7 +70,9 @@ export default function ComicViewer(props: {
             image = spriteCache[spriteID].image;
           } else {
             image = await createImageAndWaitForLoad(
-              `/sprites/copyright_issue/${sprite.character}/${sprite.index}.svg`
+              `/sprites/custom/${sprite.character}/${sprite.index}.${
+                spritesList.sprites[sprite.character].extension
+              }`
             );
             spriteCache[spriteID] = { image };
           }

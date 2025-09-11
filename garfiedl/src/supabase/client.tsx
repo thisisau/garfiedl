@@ -1,13 +1,13 @@
 import { createClient } from "@supabase/supabase-js";
 import { Database } from "./database.types";
 
-const mode: ("production" | "development") = "development"
+const mode: ("production" | "development") = "production"
 
 
 const supabase = (() => { // @ts-ignore
   if (mode === "production") return createClient<Database>(
-    "https://wpiiwklskjdchdbbnkhc.supabase.co",
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndwaWl3a2xza2pkY2hkYmJua2hjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjcyOTU3NjUsImV4cCI6MjA0Mjg3MTc2NX0.Vu-uawX0FM06WnrFQDhcRpBefiix14-WVzcvmXaFNUY"
+    "https://kwonhehurdrlzjjuavri.supabase.co",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt3b25oZWh1cmRybHpqanVhdnJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTczNTI1MDMsImV4cCI6MjA3MjkyODUwM30.8G-99BU5jBcvalwaZhCNWTiEmqVycAGSYGFCoDby7do"
   );
   else /*if (mode === "development")*/ return createClient<Database>(
     "http://127.0.0.1:54321",

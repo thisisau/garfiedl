@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import viteLogo from "/vite.svg";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/home";
 import Login from "./pages/login";
@@ -11,7 +10,6 @@ import {
   AlertHandlerContext,
 } from "./components/alerts/alert_context";
 import { GlobalElement } from "./components/alerts/global_element";
-import TestStuff from "./pages/test_stuff";
 import AfterSignup from "./pages/after_signup";
 
 import "./css/index.css";
@@ -19,11 +17,12 @@ import "./css/input.css";
 import "./css/editor.css";
 import "./css/post.css";
 import "./css/home.css";
-import "./css/nav_panel.css";
 
 import { dotPulse } from "ldrs";
 import SinglePost from "./components/post_viewer";
 import UserProfile from "./pages/user_profile";
+import Following from "./pages/following";
+import { Privacy, Terms } from "./pages/legal";
 dotPulse.register();
 
 function App() {
@@ -44,8 +43,10 @@ function App() {
             <Route path="/account" element={<Account />}></Route>
             <Route path="/post/:postID" element={<SinglePost />} />
             <Route path="/user/:username" element={<UserProfile />} />
+            <Route path="/feed/following" element={<Following />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
             <Route path="*" element={<NotFound />}></Route>
-            <Route path="/test-stuff" element={<TestStuff />}></Route>
           </Routes>
         </BrowserRouter>
         <GlobalElement />

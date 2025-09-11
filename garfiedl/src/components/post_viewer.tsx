@@ -6,17 +6,17 @@ import supabase from "../supabase/client";
 import { getPost, getReplies } from "../functions/post";
 import { filterProps } from "framer-motion";
 import { LinkIconWithTooltip } from "./tooltip";
-import MainHeader from "./header";
 import { InfiniteElementList } from "./list";
+import NavPanel from "./nav_panel";
 
 export default function PostViewer() {
   const params = useParams();
   const navigate = useNavigate();
   return (
     <div id="page-container">
-      <MainHeader />
       <div className="content">
         <div className="home-panels">
+          <NavPanel />
           <div className="center-panel">
             <div className="nav-header section">
               <LinkIconWithTooltip
@@ -126,7 +126,7 @@ export function SinglePost() {
       });
   }, [post]);
 
-  if (post.error) {
+  if (post.error || post.data === undefined) {
     return (
       <div className="post-list">
         <div className="post-error">

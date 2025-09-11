@@ -27,7 +27,10 @@ export function generateUsername(maxLength: number) {
       "pooky",
       "jon",
       "liz",
-      "jimdavis"
+      "james",
+      "jamesabram",
+      "abram",
+      "guiteau"
     ),
     randomElement("", "-", "_"),
     randomElement(
@@ -97,8 +100,8 @@ export function formatDate(
     "January",
     "February",
     "March",
-    "May",
     "April",
+    "May",
     "June",
     "July",
     "August",
@@ -144,7 +147,7 @@ export function formatDate(
 
       // Date is same year as current time
       else if (now.getFullYear() === Y) {
-        return `${shortMonthKey[M]} ${d}`;
+        return `${shortMonthKey[M]} ${D}`;
       }
 
       // Default case
@@ -170,4 +173,14 @@ export function simpleHash(str: string) {
     hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
   }
   return hash >>> 0;
+}
+
+export function plural(
+  text: string,
+  count: number = 0,
+  suffix: string = "s",
+  singularSuffix: string = ""
+) {
+  if (count === 1) return text + singularSuffix;
+  return text + suffix;
 }

@@ -19,7 +19,7 @@ export function ReportPost(props: {
       <SimplePost post={props.post} author={props.author} />
       <TextInput
         textArea
-        placeholder="Add a reason for this report..."
+        placeholder="Add a reason for this report…"
         defaultValue={info.reason}
         onUpdate={(val) => updateInfo((info) => (info.reason = val))}
         onBlur={(val) => updateInfo((info) => (info.reason = val.trim()))}

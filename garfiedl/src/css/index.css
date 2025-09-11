@@ -31,6 +31,7 @@
   --modal-content-background-color: #1c1c1c;
   --modal-background-color: rgba(0, 0, 0, 0.4);
 
+  --placeholder-text-color: rgba(255, 255, 255, 0.5);
 }
 
 ::selection {
@@ -152,7 +153,6 @@ body {
   min-height: 100%;
 }
 
-
 .login-container {
   width: 480px;
   height: 640px;
@@ -216,7 +216,7 @@ hr {
 
 .login-form {
   flex-grow: 1;
-  width: 384px;
+  width: min(384px, calc(100% - 12px));
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -297,7 +297,7 @@ textarea.text-input-component {
 }
 
 .modal>div {
-  max-width: min(80%, 480px);
+  max-width: min(calc(100% - 16px), 480px);
 }
 
 .modal>div.size-1 {
@@ -334,7 +334,7 @@ textarea.text-input-component {
   flex-direction: column;
   animation: modal-appear 250ms cubic-bezier(0.175, 0.885, 0.32, 1.275);
   animation-iteration-count: 1;
-  margin: 30px;
+  margin: 30px 0;
   max-height: 100vh;
   overflow-y: auto;
   overflow-x: clip;
@@ -347,6 +347,13 @@ textarea.text-input-component {
   flex: 1 0;
   text-align: center;
   color: var(--text-on-gradient-color);
+  white-space: nowrap;
+}
+
+@media screen and (max-width: 512px) {
+  .modal-head-close {
+    transform: translateX(10px) translateY(-16px);
+  }
 }
 
 .modal-head-close {

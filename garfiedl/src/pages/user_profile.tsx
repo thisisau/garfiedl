@@ -5,12 +5,13 @@ import supabase from "../supabase/client";
 import type { UUID } from "crypto";
 import MainHeader from "../components/header";
 import { useStateObj } from "../functions/hooks";
-import { concatClasses, simpleHash } from "../functions/functions";
+import { concatClasses, plural, simpleHash } from "../functions/functions";
 import { Post } from "../types/posts";
 import { PostPreview } from "../components/post";
 import Button from "../components/input/button";
 import { InfiniteElementList } from "../components/list";
 import { useSession } from "../supabase/hooks";
+import NavPanel from "../components/nav_panel";
 
 export default function UserProfile() {
   const navigate = useNavigate();
@@ -21,11 +22,18 @@ export default function UserProfile() {
     exists: boolean;
     id: UUID | null;
     displayName: string;
+    interactions: null | {
+      following: number;
+      followers: number;
+    };
   }>({
     exists: true,
     displayName: params.username ?? "",
     id: null,
+    interactions: null,
   });
+
+  const [followed, setFollowed] = useState(false);
 
   useEffect(() => {
     if (profile.displayName === "me") {
@@ -33,15 +41,39 @@ export default function UserProfile() {
     }
 
     supabase
-      .rpc("get_user_id", { username: profile.displayName })
-      .then((id) => {
-        if (id.data === null) {
+      .rpc("get_user_info", { username: profile.displayName })
+      .then((data) => {
+        if (data.data === null) {
           updateProfile((profile) => (profile.exists = false));
         } else {
-          updateProfile((profile) => (profile.id = id.data as UUID));
+          updateProfile((profile) => {
+            const response = data.data as {
+              id: UUID;
+              following_count: number;
+              follower_count: number;
+            };
+            profile.id = response.id;
+            profile.interactions = {
+              followers: response.follower_count,
+              following: response.following_count,
+            };
+          });
         }
       });
-  }, []);
+  }, [profile.displayName]);
+
+  useEffect(() => {
+    if (profile.id !== null)
+      supabase
+        .from("follows")
+        .select("recipient")
+        .eq("recipient", profile.id)
+        .then((resp) => {
+          if (resp.data && resp.data[0].recipient) {
+            setFollowed(true);
+          }
+        });
+  }, [profile.id]);
 
   useEffect(() => {
     const userID = session?.data.user?.id;
@@ -61,7 +93,7 @@ export default function UserProfile() {
             navigate("/");
             return;
           }
-          navigate(`/user/${displayName}`, {replace: true});
+          navigate(`/user/${displayName}`, { replace: true });
           updateProfile((profile) => {
             profile.displayName = displayName;
             profile.id = userID as UUID;
@@ -73,9 +105,9 @@ export default function UserProfile() {
 
   return (
     <div id="page-container">
-      <MainHeader />
       <div className="content">
         <div className="home-panels">
+          <NavPanel />
           <div className="center-panel">
             <div className="nav-header section">
               <LinkIconWithTooltip
@@ -93,19 +125,65 @@ export default function UserProfile() {
                 }}
                 src="/icons/arrow-left.svg"
               />
-              <span>{profile.displayName}</span>
+              <span>{profile.displayName === "me" ? <l-dot-pulse color={"white"} /> : profile.displayName}</span>
+              {session?.data.user?.id && profile.id && (
+                <LinkIconWithTooltip
+                  tooltip={followed ? "Following" : "Follow"}
+                  className="icon-container"
+                  onClick={async () => {
+                    setFollowed(!followed);
+                    if (followed) {
+                      const userID = session?.data.user?.id;
+                      updateProfile(
+                        (profile) => profile.interactions!.followers--
+                      );
+                      if (userID !== undefined && profile.id)
+                        await supabase
+                          .from("follows")
+                          .delete({ count: "estimated" })
+                          .eq("creator", userID)
+                          .eq("recipient", profile.id);
+                    } else {
+                      updateProfile(
+                        (profile) => profile.interactions!.followers++
+                      );
+                      await supabase.from("follows").insert({
+                        recipient: profile.id,
+                        creator: session?.data.user?.id,
+                      });
+                    }
+                  }}
+                  src={
+                    followed
+                      ? "/icons/heart-like-solid.svg"
+                      : "/icons/heart-like.svg"
+                  }
+                />
+              )}
               <div className="icon-container profile-picture">
                 {profile.id === null ? (
                   <span>?</span>
                 ) : (
                   <img
-                    src={`/sprites/copyright_issue/animals/${
-                      simpleHash(profile.id ?? "Unknown User") % 24
+                    src={`/sprites/custom/garfiedl/${
+                      simpleHash(profile.id ?? "Unknown User") % 6
                     }.svg`}
                   />
                 )}
               </div>
             </div>
+            {profile.interactions && (
+              <div className="interactions-panel">
+                <div className="section">
+                  {profile.interactions.followers}{" "}
+                  {plural("follower", profile.interactions.followers)}
+                </div>
+                <div className="section">
+                  {profile.interactions.following} following
+                </div>
+              </div>
+            )}
+
             {profile.id ? (
               <UserPostList userID={profile.id} />
             ) : profile.exists ? (

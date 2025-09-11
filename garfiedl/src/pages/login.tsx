@@ -9,7 +9,7 @@ import Button from "../components/input/button";
 import { login, signup } from "../functions/login_manager";
 import { useAnimate } from "framer-motion";
 import { entryAnimation, exitAnimation } from "../functions/animations";
-
+import { Link } from "react-router-dom";
 
 export default function AccountManager() {
   const [mode, setMode] = useState<{
@@ -26,7 +26,8 @@ export default function AccountManager() {
 
   function Login() {
     useEffect(() => {
-      if (mode.doEntryAnimation) entryAnimation(animate, ".login-container-content");
+      if (mode.doEntryAnimation)
+        entryAnimation(animate, ".login-container-content");
     }, []);
 
     return (
@@ -54,7 +55,8 @@ export default function AccountManager() {
 
   function SignUp() {
     useEffect(() => {
-      if (mode.doEntryAnimation) entryAnimation(animate, ".login-container-content");
+      if (mode.doEntryAnimation)
+        entryAnimation(animate, ".login-container-content");
     }, []);
     return (
       <div className="login-container section">
@@ -94,7 +96,7 @@ export default function AccountManager() {
     // };
 
     return (
-      <form className="login-form" onSubmit={e => e.preventDefault()}>
+      <form className="login-form" onSubmit={(e) => e.preventDefault()}>
         <div>
           <TextInput
             placeholder="Email Address"
@@ -163,7 +165,7 @@ export default function AccountManager() {
     // };
 
     return (
-      <form className="login-form"onSubmit={e => e.preventDefault()}>
+      <form className="login-form" onSubmit={(e) => e.preventDefault()}>
         <div>
           <TextInput
             placeholder="Email Address"
@@ -190,16 +192,22 @@ export default function AccountManager() {
             type="submit"
             id="signup-submit"
             onClick={() => {
-              console.log("Signing up ONE TIME with info", loginInfo)
+              console.log("Signing up ONE TIME with info", loginInfo);
               signup(loginInfo, setLoginIncorrectContent).then((data) => {
                 if (data && data.error === null) {
                   const emailKey = crypto.randomUUID();
-                  const searchParams = new URLSearchParams(window.location.search);
+                  const searchParams = new URLSearchParams(
+                    window.location.search
+                  );
                   searchParams.set("emailKey", encodeURIComponent(emailKey));
-                  localStorage.setItem(`auth-email-${emailKey}`, loginInfo.current.email)
-                  window.location.href = "/signup/after?" + searchParams.toString()
+                  localStorage.setItem(
+                    `auth-email-${emailKey}`,
+                    loginInfo.current.email
+                  );
+                  window.location.href =
+                    "/signup/after?" + searchParams.toString();
                 }
-              })
+              });
             }}
             className={"login-submit-button"}
           >
@@ -207,6 +215,17 @@ export default function AccountManager() {
           </Button>
           <span className="login-incorrect-warning">
             {loginIncorrectContent}
+          </span>
+          <span style={{ textAlign: "center" }}>
+            By continuing, you agree to our{" "}
+            <Link to="/terms" target="_blank">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link to="/privacy" target="_blank">
+              Privacy Policy
+            </Link>
+            .
           </span>
         </div>
         <div>

@@ -5,6 +5,7 @@ export type Sprites = {
     [items in Characters]: {
       displayName: string;
       length: number;
+      extension: string;
     };
   } & {
     bubbles: {
@@ -14,19 +15,9 @@ export type Sprites = {
 };
 
 export type Characters =
-  | "animals"
-  | "arlene"
   | "backgrounds"
   | "bubbles"
-  | "garfield"
-  | "irma"
-  | "jon"
-  | "liz"
-  | "nermal"
-  | "odie"
-  | "props"
-  | "squeak"
-  | "text";
+  | "garfiedl"
 
 export type ImageSprite = {
   character: Characters;
@@ -236,7 +227,7 @@ export function drawOnCanvas(
 }
 
 export const spritesList: Sprites = await (
-  await fetch("/sprites/copyright_issue/sprites.json")
+  await fetch("/sprites/custom/sprites.json")
 ).json();
 
 export const spriteCache: {

@@ -17,6 +17,11 @@ set
  END; $$ language plpgsql security definer;
 
 
+CREATE TRIGGER account_create_trigger
+AFTER INSERT ON auth.users FOR EACH ROW
+EXECUTE PROCEDURE public.create_profile_for_new_user ();
+
+
 -- Change username function
 create or replace function public.change_username(user_id TEXT, new_username TEXT) returns null
 declare
@@ -212,13 +217,13 @@ end;
 $$;
 
 create or replace function
-get_user_id (username text)
-returns uuid
+get_user_info (username text)
+returns record
 security definer
 language sql
 set search_path = ''
 as $$
-  select id from public.profiles where display_name = username
+  select id, following_count, follower_count from public.profiles where display_name = username
 $$;
 
 -- Unreply post
@@ -242,7 +247,7 @@ set
 begin
   update public.profiles
   set following_count = following_count + 1
-  where NEW.author = id;
+  where NEW.creator = id;
   update public.profiles
   set follower_count = follower_count + 1
   where NEW.recipient = id;
@@ -258,7 +263,7 @@ set
 begin
   update public.profiles
   set following_count = following_count - 1
-  where OLD.author = id;
+  where OLD.creator = id;
   update public.profiles
   set follower_count = follower_count - 1
   where OLD.recipient = id;
@@ -273,3 +278,34 @@ EXECUTE PROCEDURE increment_follows ();
 CREATE TRIGGER user_unfollow_trigger
 BEFORE DELETE ON public.follows FOR EACH ROW
 EXECUTE PROCEDURE decrement_follows ();
+
+create or replace function get_followed_posts (
+  page_number int
+) returns record[]
+set search_path = ''
+language sql
+security invoker
+as $$
+  select * from public.posts
+  where type in ('post', 'repost', 'quote') and
+    exists (
+      select 1 from public.follows where recipient = posts.author and creator = auth.uid()
+    )
+  order by created_at desc
+  limit 5 offset page_number * 5;
+$$;
+
+create or update view followed_posts
+as
+  select * from public.posts
+  where type in ('post', 'repost', 'quote') and
+    exists (
+      select 1 from public.follows where recipient = posts.author and creator = auth.uid()
+    )
+  order by created_at desc;
+
+create or replace view suggested_posts
+as
+  select *, -extract(epoch from now() - created_at) / 60 + POWER(likes, 0.67) * 10 as relevance from public.posts
+  where type in ('post', 'repost', 'quote')
+  order by relevance desc;

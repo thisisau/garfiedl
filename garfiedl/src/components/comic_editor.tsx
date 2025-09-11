@@ -88,12 +88,26 @@ function FrameEditor(props: { onSave: (comic: Comic) => void }) {
   useEffect(() => {
     if (comicViewerRef.current !== null) {
       const comicViewer = comicViewerRef.current;
-      comicViewer.onmousedown = (e) => {
+      const mouseDownCallback = (e: MouseEvent | TouchEvent) => {
         const targetElement = e.target as HTMLCanvasElement;
-        clickPoint.current = {
-          x: (e.offsetX * targetElement.width) / targetElement.clientWidth,
-          y: (e.offsetY * targetElement.height) / targetElement.clientHeight,
-        };
+        const targetBounds = targetElement.getBoundingClientRect();
+        console.log(e);
+        if (e instanceof MouseEvent)
+          clickPoint.current = {
+            x: (e.offsetX * targetElement.width) / targetElement.clientWidth,
+            y: (e.offsetY * targetElement.height) / targetElement.clientHeight,
+          };
+        else
+          clickPoint.current = {
+            x:
+              ((e.targetTouches[0].pageX - targetBounds.left) *
+                targetElement.width) /
+              targetElement.clientWidth,
+            y:
+              ((e.targetTouches[0].pageY - targetBounds.top) *
+                targetElement.height) /
+              targetElement.clientHeight,
+          };
         const selectedObject = objects.findIndex((e) => {
           const center = { x: e.x + e.width / 2, y: e.y + e.height / 2 };
 
@@ -134,13 +148,32 @@ function FrameEditor(props: { onSave: (comic: Comic) => void }) {
           e.forEach((_, i, a) => (a[i].mouseDown = i === selectedObject))
         );
       };
-      const moveSelectedObject = (e: MouseEvent) => {
-
+      comicViewer.ontouchstart = mouseDownCallback;
+      comicViewer.onmousedown = mouseDownCallback;
+      const moveSelectedObject = (e: MouseEvent | TouchEvent) => {
+        console.log(e);
         const targetElement = e.target as HTMLCanvasElement;
-        const thisClickPoint = {
-          x: (e.offsetX * targetElement.width) / targetElement.clientWidth,
-          y: (e.offsetY * targetElement.height) / targetElement.clientHeight,
-        };
+        const targetBounds = targetElement.getBoundingClientRect();
+        const thisClickPoint =
+          e instanceof MouseEvent
+            ? {
+                x:
+                  (e.offsetX * targetElement.width) / targetElement.clientWidth,
+                y:
+                  (e.offsetY * targetElement.height) /
+                  targetElement.clientHeight,
+              }
+            : {
+                x:
+                  ((e.changedTouches[0].pageX - targetBounds.left) *
+                    targetElement.width) /
+                  targetElement.clientWidth,
+                y:
+                  ((e.changedTouches[0].pageY - targetBounds.top) *
+                    targetElement.height) /
+                  targetElement.clientHeight,
+              };
+
         const selected = objects.findIndex((e) => e.mouseDown);
         const initialClickPoint: { x: number; y: number } /*| null*/ =
           clickPoint.current!;
@@ -155,8 +188,10 @@ function FrameEditor(props: { onSave: (comic: Comic) => void }) {
           updateComic((e2) => {
             const thisSpriteTransformations =
               e2.panels[frame].sprites[selected].transformations;
-            thisSpriteTransformations.dx += thisClickPoint.x - initialClickPoint.x;
-            thisSpriteTransformations.dy += thisClickPoint.y - initialClickPoint.y;
+            thisSpriteTransformations.dx +=
+              thisClickPoint.x - initialClickPoint.x;
+            thisSpriteTransformations.dy +=
+              thisClickPoint.y - initialClickPoint.y;
             const thisPanel = e2.panels[frame];
 
             thisPanel.sprites = thisPanel.sprites
@@ -165,7 +200,7 @@ function FrameEditor(props: { onSave: (comic: Comic) => void }) {
           });
         }
       };
-      comicViewer.onmouseup = (e) => {
+      const mouseUpCallback = (e: MouseEvent | TouchEvent) => {
         updateObjects((e2) =>
           e2.forEach((f) => {
             if (f.mouseDown) f.mouseDown = false;
@@ -173,7 +208,10 @@ function FrameEditor(props: { onSave: (comic: Comic) => void }) {
         );
         moveSelectedObject(e);
       };
-      comicViewer.onmouseleave = comicViewer.onmouseup;
+      comicViewer.onmouseup = mouseUpCallback;
+      comicViewer.onmouseleave = mouseUpCallback;
+      comicViewer.ontouchcancel = mouseUpCallback;
+      comicViewer.ontouchend = mouseUpCallback;
     }
   }, [comicViewerRef, comic, objects]);
 
@@ -202,11 +240,15 @@ function FrameEditor(props: { onSave: (comic: Comic) => void }) {
         <p>
           Frame {frame + 1} of {comic.panels.length}
           <br />
-          {capitalizeFirstLetter(selectedSprite?.character ?? "none")}
+          {selectedSprite
+            ? spritesList.sprites[selectedSprite.character].displayName
+            : "None"}
         </p>
         {selectedSprite && (
           <img
-            src={`/sprites/copyright_issue/${selectedSprite.character}/${selectedSprite.index}.svg`}
+            src={`/sprites/custom/${selectedSprite.character}/${
+              selectedSprite.index
+            }.${spritesList.sprites[selectedSprite.character].extension}`}
           />
         )}
       </div>
@@ -232,7 +274,7 @@ function FrameEditor(props: { onSave: (comic: Comic) => void }) {
           />
           {selectedSprite.type === "text" ? (
             <TextInput
-              placeholder="Add some text here..."
+              placeholder="Add some text here…"
               defaultValue={selectedSprite.textContent}
               onUpdate={(val) =>
                 updateComic((e) => {
@@ -336,11 +378,11 @@ function CharacterSelector(props: {
 }) {
   const { updateComic, frame } = props;
   const [character, setCharacter] =
-    useState<keyof typeof spritesList.sprites>("garfield");
+    useState<keyof typeof spritesList.sprites>("garfiedl");
   return (
     <div className="character-selector">
       <DropdownInput
-        options={Object.keys(spritesList.sprites).map(toTitle)}
+        options={Object.values(spritesList.sprites).map((e) => e.displayName)}
         defaultOption={Object.keys(spritesList.sprites).indexOf(character)}
         onUpdate={(e) =>
           setCharacter(
@@ -359,7 +401,7 @@ function CharacterSelector(props: {
             let image: HTMLImageElement;
             if (!thisCharacter || !thisCharacter.image) {
               image = new Image();
-              image.src = `/sprites/copyright_issue/${character}/${i}.svg`;
+              image.src = `/sprites/custom/${character}/${i}.${spritesList.sprites[character].extension}`;
               image.onload = () => {
                 spriteCache[`${character}-${i}`] = { image };
               };
@@ -418,7 +460,9 @@ function CharacterSelector(props: {
                   if (props.onSelect) props.onSelect(character, i, ev);
                 }}
               >
-                <img src={`/sprites/copyright_issue/${character}/${i}.svg`} />
+                <img
+                  src={`/sprites/custom/${character}/${i}.${spritesList.sprites[character].extension}`}
+                />
               </Button>
             );
           }
@@ -439,7 +483,9 @@ function genObjects(comic: Comic, frame: number): Promise<Array<Shape>> {
       dimensions = thisSprite.image;
     } else {
       const image = await createImageAndWaitForLoad(
-        `/sprites/copyright_issue/${e.character}/${e.index}.svg`
+        `/sprites/custom/${e.character}/${e.index}.${
+          spritesList.sprites[e.character].extension
+        }`
       );
       spriteCache[`${e.character}-${e.index}`] = { image };
       dimensions = image;

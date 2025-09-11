@@ -58,6 +58,42 @@ export type Database = {
         }
         Relationships: []
       }
+      follows: {
+        Row: {
+          created_at: string
+          creator: string | null
+          id: number
+          recipient: string | null
+        }
+        Insert: {
+          created_at?: string
+          creator?: string | null
+          id?: number
+          recipient?: string | null
+        }
+        Update: {
+          created_at?: string
+          creator?: string | null
+          id?: number
+          recipient?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follows_creator_fkey"
+            columns: ["creator"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "follows_recipient_fkey"
+            columns: ["recipient"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           author: string | null
@@ -114,7 +150,21 @@ export type Database = {
             foreignKeyName: "posts_reference_fkey"
             columns: ["reference"]
             isOneToOne: false
+            referencedRelation: "followed_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
+            referencedRelation: "suggested_posts"
             referencedColumns: ["id"]
           },
         ]
@@ -143,7 +193,21 @@ export type Database = {
             foreignKeyName: "posts_likes_post_fkey"
             columns: ["post"]
             isOneToOne: false
+            referencedRelation: "followed_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_likes_post_fkey"
+            columns: ["post"]
+            isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_likes_post_fkey"
+            columns: ["post"]
+            isOneToOne: false
+            referencedRelation: "suggested_posts"
             referencedColumns: ["id"]
           },
           {
@@ -182,7 +246,21 @@ export type Database = {
             foreignKeyName: "posts_reports_reference_fkey"
             columns: ["reference"]
             isOneToOne: false
+            referencedRelation: "followed_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_reports_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
             referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_reports_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
+            referencedRelation: "suggested_posts"
             referencedColumns: ["id"]
           },
           {
@@ -197,16 +275,22 @@ export type Database = {
       profiles: {
         Row: {
           display_name: string | null
+          follower_count: number
+          following_count: number
           id: string
           posts_banned: boolean
         }
         Insert: {
           display_name?: string | null
+          follower_count?: number
+          following_count?: number
           id: string
           posts_banned?: boolean
         }
         Update: {
           display_name?: string | null
+          follower_count?: number
+          following_count?: number
           id?: string
           posts_banned?: boolean
         }
@@ -214,7 +298,159 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      followed_posts: {
+        Row: {
+          author: string | null
+          body: string | null
+          comic: string | null
+          created_at: string | null
+          id: number | null
+          likes: number | null
+          link: string | null
+          reference: number | null
+          replies: number | null
+          type: Database["public"]["Enums"]["post_type"] | null
+        }
+        Insert: {
+          author?: string | null
+          body?: string | null
+          comic?: string | null
+          created_at?: string | null
+          id?: number | null
+          likes?: number | null
+          link?: string | null
+          reference?: number | null
+          replies?: number | null
+          type?: Database["public"]["Enums"]["post_type"] | null
+        }
+        Update: {
+          author?: string | null
+          body?: string | null
+          comic?: string | null
+          created_at?: string | null
+          id?: number | null
+          likes?: number | null
+          link?: string | null
+          reference?: number | null
+          replies?: number | null
+          type?: Database["public"]["Enums"]["post_type"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_comic_fkey"
+            columns: ["comic"]
+            isOneToOne: false
+            referencedRelation: "comics"
+            referencedColumns: ["locator"]
+          },
+          {
+            foreignKeyName: "posts_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
+            referencedRelation: "followed_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
+            referencedRelation: "suggested_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suggested_posts: {
+        Row: {
+          author: string | null
+          body: string | null
+          comic: string | null
+          created_at: string | null
+          id: number | null
+          likes: number | null
+          link: string | null
+          reference: number | null
+          relevance: number | null
+          replies: number | null
+          type: Database["public"]["Enums"]["post_type"] | null
+        }
+        Insert: {
+          author?: string | null
+          body?: string | null
+          comic?: string | null
+          created_at?: string | null
+          id?: number | null
+          likes?: number | null
+          link?: string | null
+          reference?: number | null
+          relevance?: never
+          replies?: number | null
+          type?: Database["public"]["Enums"]["post_type"] | null
+        }
+        Update: {
+          author?: string | null
+          body?: string | null
+          comic?: string | null
+          created_at?: string | null
+          id?: number | null
+          likes?: number | null
+          link?: string | null
+          reference?: number | null
+          relevance?: never
+          replies?: number | null
+          type?: Database["public"]["Enums"]["post_type"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_fkey"
+            columns: ["author"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_comic_fkey"
+            columns: ["comic"]
+            isOneToOne: false
+            referencedRelation: "comics"
+            referencedColumns: ["locator"]
+          },
+          {
+            foreignKeyName: "posts_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
+            referencedRelation: "followed_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "posts_reference_fkey"
+            columns: ["reference"]
+            isOneToOne: false
+            referencedRelation: "suggested_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       change_username: {
@@ -236,18 +472,25 @@ export type Database = {
         }
         Returns: string
       }
-      get_user_id: {
+      get_followed_posts: {
         Args: {
-          username: string
+          page_number: number
         }
-        Returns: string
+        Returns: Record<string, unknown>
       }
-      get_user_info: {
-        Args: {
-          user_id: string
-        }
-        Returns: Json
-      }
+      get_user_info:
+        | {
+            Args: {
+              user_id: string
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              username: string
+            }
+            Returns: Record<string, unknown>
+          }
       post_is_liked: {
         Args: {
           post_id: number

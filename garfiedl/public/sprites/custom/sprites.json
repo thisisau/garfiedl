@@ -1,0 +1,28 @@
+{
+  "sprites": {
+    "backgrounds": {
+      "displayName": "Backdrops",
+      "length": 3,
+      "extension": "jpg"
+    },
+    "bubbles": {
+      "displayName": "Speech Bubbles",
+      "length": 2,
+      "centers": [
+        { "x": 120, "y": 74 },
+        { "x": 120, "y": 74 }
+      ],
+      "extension": "svg"
+    },
+    "garfiedl": {
+      "displayName": "James A. Garfield",
+      "length": 6,
+      "extension": "svg"
+    },
+    "aestheticCat": {
+      "displayName": "Aesthetic Cat",
+      "length": 2,
+      "extension": "svg"
+    }
+  }
+}

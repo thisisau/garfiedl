@@ -1,66 +1,137 @@
-import {
-  AnchorHTMLAttributes,
-  HTMLAttributeAnchorTarget,
-  MouseEventHandler,
-  useEffect,
-  useMemo,
-  useRef,
-} from "react";
-import Button from "./input/button";
+import { HTMLAttributeAnchorTarget, MouseEventHandler, useRef } from "react";
 import { useOpenPostDraft } from "./post_creator";
+import { useIsLoggedIn } from "../supabase/hooks";
+import { useScreenSize } from "../functions/hooks";
+import { Dropdown } from "./input/dropdown";
 import { Link } from "react-router-dom";
-import { useIsLoggedIn, useSession } from "../supabase/hooks";
+import { useAddAlert } from "./alerts/alert_hooks";
+import { Modal } from "./modal";
+
+function NavLinks() {
+  const addAlert = useAddAlert();
+  return (
+    <div className="links">
+      <Link to="/terms">Terms</Link> <Link to="/privacy">Privacy</Link>{" "}
+      <a
+        href="."
+        onClick={(e) => {
+          e.preventDefault();
+          addAlert(
+            <Modal title="Contact">
+              For inquiries and support, contact
+              james.a&nbsp;[at]&nbsp;garfiedl&nbsp;[dot]&nbsp;com
+            </Modal>
+          );
+        }}
+      >
+        Contact
+      </a>
+    </div>
+  );
+}
 
 export default function NavPanel() {
   const isLoggedIn = useIsLoggedIn();
-  const session = useSession();
   const openPostDraft = useOpenPostDraft();
   const panelRef = useRef<HTMLDivElement>(null);
+  const screenSize = useScreenSize();
+  if (screenSize.width >= 990)
+    return (
+      <div className="nav-panel" ref={panelRef}>
+        <Link className="home-link" to="/">
+          garfiedl.com
+        </Link>
+        {isLoggedIn ? (
+          <>
+            <NavOption
+              imageSrc="/icons/send.svg"
+              onClick={() => {
+                openPostDraft({ mode: "post" });
+              }}
+            >
+              Create Post
+            </NavOption>
+            <NavOption imageSrc="/icons/heart-like.svg" to={`/feed/following`}>
+              Following
+            </NavOption>
+            <NavOption imageSrc="/icons/user-single.svg" to={`/user/me`}>
+              Profile
+            </NavOption>
+            <NavOption imageSrc="/icons/setting.svg" to={`/account`}>
+              Settings
+            </NavOption>
+          </>
+        ) : (
+          <>
+            <NavOption
+              to={
+                window.location.pathname.length > 1
+                  ? `/login?redirect=${encodeURIComponent(
+                      window.location.pathname.substring(1)
+                    )}`
+                  : "/login"
+              }
+              imageSrc="/icons/user-add.svg"
+            >
+              Sign in
+            </NavOption>
+          </>
+        )}
+        <NavLinks />
+      </div>
+    );
 
   return (
     <div className="nav-panel" ref={panelRef}>
-      <a className="home-link" href="/">
-        garfiedl.com
-      </a>
-      <NavOption imageSrc="/icons/user-cough.svg" to={"/"}>
-        Home
-      </NavOption>
-      {isLoggedIn ? (
-        <>
-          <NavOption
-            imageSrc="/icons/send.svg"
-            onClick={() => {
-              openPostDraft({ mode: "post" });
-            }}
-          >
-            Create Post
-          </NavOption>
-          <NavOption imageSrc="/icons/user-cough.svg" to={`/feed/following`}>
-            Following
-          </NavOption>
-          <NavOption imageSrc="/icons/user-cough.svg" to={`/user/me`}>
-            Profile
-          </NavOption>
-        </>
-      ) : (
-        <>
-          <NavOption
-            to={
-              window.location.pathname.length > 1
-                ? `/login?redirect=${encodeURIComponent(
-                    window.location.pathname.substring(1)
-                  )}`
-                : "/login"
-            }
-            imageSrc="/icons/user-cough.svg"
-          >
-            Sign in
-          </NavOption>
-        </>
-      )}
-      <NavOption imageSrc="/icons/user-cough.svg" to={`/account`}>
-        Settings
-      </NavOption>
+      <Link className="home-link" to="/">
+        <img src="/favicon.ico" />
+      </Link>
+      <Dropdown
+        containerClass="mobile-navigator"
+        header={
+          <div className="head icon-container section">
+            <img src="/icons/menu-hamburger.svg" />
+          </div>
+        }
+      >
+        {isLoggedIn ? (
+          <>
+            <NavOption
+              imageSrc="/icons/send.svg"
+              onClick={() => {
+                openPostDraft({ mode: "post" });
+              }}
+            >
+              Create Post
+            </NavOption>
+            <NavOption imageSrc="/icons/heart-like.svg" to={`/feed/following`}>
+              Following
+            </NavOption>
+            <NavOption imageSrc="/icons/user-single.svg" to={`/user/me`}>
+              Profile
+            </NavOption>
+            <NavOption imageSrc="/icons/setting.svg" to={`/account`}>
+              Settings
+            </NavOption>
+          </>
+        ) : (
+          <>
+            <NavOption
+              to={
+                window.location.pathname.length > 1
+                  ? `/login?redirect=${encodeURIComponent(
+                      window.location.pathname.substring(1)
+                    )}`
+                  : "/login"
+              }
+              imageSrc="/icons/user-add.svg"
+            >
+              Sign in
+            </NavOption>
+          </>
+        )}
+        <NavLinks />
+      </Dropdown>
     </div>
   );
 }

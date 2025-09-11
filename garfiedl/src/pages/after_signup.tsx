@@ -148,7 +148,7 @@ export default function AfterSignup(props: {
                   e.preventDefault();
                   const alert = addAlert(
                     <Modal title="Verification">
-                      Sending a code to {email.current}...
+                      Sending a code to {email.current}…
                     </Modal>
                   );
                   await supabase.auth.signInWithOtp({ email: email.current });
@@ -201,7 +201,7 @@ export default function AfterSignup(props: {
                 className="username-editor"
                 maxLength={16}
                 textAlign="center"
-                placeholder="Add a username..."
+                placeholder="Add a username…"
                 onUpdate={(val) => setInfo((e) => (e.username = val))}
                 defaultValue={info.username}
               />

@@ -3,6 +3,7 @@ import supabase from "../supabase/client";
 import { useSession } from "../supabase/hooks";
 import { useAddAlert } from "./alerts/alert_hooks";
 import { Modal } from "./modal";
+import { Link } from "react-router-dom";
 export default function MainHeader() {
   const session = useSession();
   const addAlert = useAddAlert();
@@ -11,9 +12,9 @@ export default function MainHeader() {
     <div id="header" className="section">
       <div>
         <h1>
-          <a href="/" className="undecorated">
+          <Link to="/" className="undecorated">
             GarfieDL.Com
-          </a>
+          </Link>
         </h1>
       </div>
       <div>
