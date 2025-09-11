@@ -18,6 +18,7 @@ export type Characters =
   | "backgrounds"
   | "bubbles"
   | "garfiedl"
+  | "aestheticCat"
 
 export type ImageSprite = {
   character: Characters;
@@ -226,9 +227,34 @@ export function drawOnCanvas(
   }
 }
 
-export let spritesList: Sprites;
-
-fetch("/sprites/custom/sprites.json").then(e => e.json().then(ee => spritesList = ee))
+export const spritesList: Sprites = {
+  "sprites": {
+    "backgrounds": {
+      "displayName": "Backdrops",
+      "length": 3,
+      "extension": "jpg"
+    },
+    "bubbles": {
+      "displayName": "Speech Bubbles",
+      "length": 2,
+      "centers": [
+        { "x": 120, "y": 74 },
+        { "x": 120, "y": 74 }
+      ],
+      "extension": "svg"
+    },
+    "garfiedl": {
+      "displayName": "James A. Garfield",
+      "length": 6,
+      "extension": "svg"
+    },
+    "aestheticCat": {
+      "displayName": "Aesthetic Cat",
+      "length": 2,
+      "extension": "svg"
+    }
+  }
+}
 
 
 export const spriteCache: {
