@@ -121,10 +121,6 @@ export function PostPreview(props: {
         "post-preview section undecorated",
         !props.displayData?.noLink?.includes(post.id) && "link-to-post"
       )}
-      // state={{
-      //   post
-      // }}
-      // to={`/post/${post.id}`}
       draggable={false}
     >
       <div
@@ -310,6 +306,63 @@ export function PostPreview(props: {
                     <span>Report Post</span>
                   </Button>
                 )}
+              {session?.data.user?.id &&
+                session?.data.user?.id ===
+                  props.displayData?.repost?.author.id && (
+                  <Button
+                    color="dark"
+                    onClick={(e) => {
+                      addAlert((clear) => (
+                        <Modal title="Delete ReGarf">
+                          <div>
+                            <div>
+                              Are you sure you would like to remove this ReGarf
+                              from your profile? This action cannot be undone.
+                            </div>
+                            <p />
+                            <div>
+                              <Button onClick={clear}>No, Cancel</Button>{" "}
+                              <Button
+                                onClick={async () => {
+                                  const { error } = await supabase
+                                    .from("posts")
+                                    .delete()
+                                    .eq(
+                                      "id",
+                                      props.displayData
+                                        ?.referenceStack![0] as number
+                                    );
+
+                                  if (error) {
+                                    addAlert(
+                                      <Modal title="Error">
+                                        {error.message}
+                                      </Modal>
+                                    );
+                                    return;
+                                  }
+
+                                  (e.target as HTMLButtonElement)
+                                    .closest(".post-preview")
+                                    ?.remove();
+
+                                  clear();
+                                }}
+                              >
+                                Yes, Delete
+                              </Button>
+                            </div>
+                          </div>
+                        </Modal>
+                      ));
+                    }}
+                  >
+                    <div className="icon-container">
+                      <img src="/icons/trash.svg" />
+                    </div>
+                    <span>Delete ReGarf</span>
+                  </Button>
+                )}
               <Button
                 color="dark"
                 onClick={async (e) => {
@@ -439,7 +492,7 @@ export function PostPreview(props: {
                 tooltip="ReGarf"
                 onClick={() => {
                   if (!loggedIn) return;
-                  addAlert((clearAlert) => (
+                  addAlert((clearAlert, replaceAlert) => (
                     <Modal title="Confirm ReGarf">
                       <div>
                         <div>
@@ -450,10 +503,27 @@ export function PostPreview(props: {
                           <Button onClick={clearAlert}>No, Cancel</Button>{" "}
                           <Button
                             onClick={async () => {
-                              await supabase.from("posts").insert({
-                                type: "repost",
-                                reference: post.id,
-                              });
+                              replaceAlert(
+                                <Modal title="Confirm ReGarf">
+                                  <l-dot-pulse color="white" />
+                                </Modal>
+                              );
+                              const { data, error } = await supabase
+                                .from("posts")
+                                .insert({
+                                  type: "repost",
+                                  reference: post.id,
+                                })
+                                .select("id");
+
+                              if (error) {
+                                replaceAlert(
+                                  <Modal title="Error">{error.message}</Modal>
+                                );
+                                return;
+                              }
+
+                              clearAlert();
                             }}
                           >
                             Yes, ReGarf!
@@ -468,7 +538,10 @@ export function PostPreview(props: {
             <div>
               <LinkIconWithTooltip
                 src={`/icons/user-cough.svg`}
-                className={concatClasses("icon-container", !loggedIn && "no-access")}
+                className={concatClasses(
+                  "icon-container",
+                  !loggedIn && "no-access"
+                )}
                 tooltip="Quote"
                 onClick={() => {
                   if (!loggedIn) return;

@@ -307,5 +307,10 @@ as
 create or replace view suggested_posts
 as
   select *, -extract(epoch from now() - created_at) / 60 + POWER(likes, 0.67) * 10 as relevance from public.posts
-  where type in ('post', 'repost', 'quote')
+  where type in ('post', 'quote')
+  or (
+    (type = 'repost') and exists (
+      select 1 from public.follows where recipient = posts.author and creator = auth.uid()
+    )
+  )
   order by relevance desc;

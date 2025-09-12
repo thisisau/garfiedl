@@ -402,4 +402,16 @@
     gap: 4px;
     flex-basis: auto;
   }
+
+  .post-preview > .post-content > .information > * {
+    flex-shrink: 0;
+  }
+
+  .post-preview .repost-author {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    flex-basis: 0;
+    flex-grow: 1;
+  }
 }
