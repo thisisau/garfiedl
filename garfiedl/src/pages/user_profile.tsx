@@ -66,7 +66,7 @@ export default function UserProfile() {
         .select("recipient")
         .eq("recipient", profile.id)
         .then((resp) => {
-          if (resp.data && resp.data[0].recipient) {
+          if (resp.data && resp.data.length > 0 && resp.data[0].recipient) {
             setFollowed(true);
           }
         });
@@ -141,6 +141,7 @@ export default function UserProfile() {
                           .eq("creator", userID)
                           .eq("recipient", profile.id);
                     } else {
+                      console.log(profile);
                       updateProfile(
                         (profile) => profile.interactions!.followers++
                       );

@@ -314,3 +314,15 @@ as
     )
   )
   order by relevance desc;
+
+
+create or replace function user_exists(search_user_id uuid)
+returns boolean
+security definer
+language plpgsql
+set search_path = ''
+as $$
+BEGIN
+  return exists(select 1 from public.profiles where id = search_user_id);
+END;
+$$;
