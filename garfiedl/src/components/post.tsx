@@ -508,7 +508,7 @@ export function PostPreview(props: {
                                   <l-dot-pulse color="white" />
                                 </Modal>
                               );
-                              const { data, error } = await supabase
+                              const { error } = await supabase
                                 .from("posts")
                                 .insert({
                                   type: "repost",
