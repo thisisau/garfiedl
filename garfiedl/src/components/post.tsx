@@ -625,8 +625,8 @@ function OnlineComic(props: { id: string }) {
               <ComicViewer
                 comic={comic}
                 style={{
-                  width: "calc(100vw - 2px)",
-                  height: "calc(100vh - 2px)",
+                  width: "calc(100% - 2px)",
+                  height: "calc(100% - 2px)",
                   objectFit: "contain",
                   borderColor: "transparent",
                 }}

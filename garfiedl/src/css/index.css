@@ -70,9 +70,13 @@ a {
   text-decoration: underline;
 }
 
+#root {
+  width: 100%;
+}
+
 #page-container {
   display: flex;
-  min-width: 100vw;
+  min-width: 100%;
   min-height: 100vh;
   flex-direction: column;
 }
