@@ -625,8 +625,8 @@ function OnlineComic(props: { id: string }) {
               <ComicViewer
                 comic={comic}
                 style={{
-                  width: "calc(100vw - 2px)",
-                  height: "calc(100vh - 2px)",
+                  width: "calc(100% - 2px)",
+                  height: "calc(100% - 2px)",
                   objectFit: "contain",
                   borderColor: "transparent",
                 }}
@@ -679,10 +679,6 @@ export function SimplePost(props: {
           <div className="author">
             <span>{props.author.displayName}</span>
           </div>
-          <div>
-            <span>{props.post.type}</span>
-          </div>
-
           <div className="date">
             <ElementWithTooltip
               tooltip={formatDate(new Date(props.post.created_at), "very-long")}
@@ -691,6 +687,17 @@ export function SimplePost(props: {
                 {formatDate(new Date(props.post.created_at), "short-adapt")}
               </span>
             </ElementWithTooltip>
+          </div>
+          <div className="options">
+            <LinkIconWithTooltip
+              src="/icons/external.svg"
+              tooltip="View Post"
+              onClick={() => {
+                window.open(`/post/${props.post.id}`, "_blank");
+              }}
+              target="_blank"
+              className="head icon-container"
+            />
           </div>
         </div>
         <div className="body">{props.post.body}</div>

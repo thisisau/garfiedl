@@ -135,24 +135,27 @@ hr.gray {
 .nav-panel .links {
   display: flex;
   flex-grow: 1;
+  justify-content: end;
+  flex-direction: column;
+  gap: 8px;
   align-items: end;
 }
 
-.nav-panel .links > :not(:first-child) {
+.nav-panel .links>div> :not(:first-child) {
   margin-left: 8px;
 }
 
-.nav-panel .links > :not(:last-child) {
+.nav-panel .links>div> :not(:last-child) {
   padding-right: 7px;
   border-right: 1px solid var(--section-border);
 }
 
-.nav-panel .links > * {
+.nav-panel .links>div>* {
   color: var(--section-border-2);
   text-decoration: none;
 }
 
-.nav-panel .links > :hover {
+.nav-panel .links>div> :hover {
   filter: brightness(1.25);
 }
 
@@ -194,5 +197,6 @@ hr.gray {
   .nav-panel .links {
     justify-content: center;
     padding: 12px;
+    align-items: center;
   }
 }

@@ -380,7 +380,7 @@
 }
 
 @media screen and (max-width: 480px) {
-  .post-preview {
+  .post-list > .post-preview {
     margin: 0 -18px;
   }
 

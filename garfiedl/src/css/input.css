@@ -5,7 +5,7 @@
   position: relative;
 }
 
-.dropdown > .dropdown-head > button {
+.dropdown>.dropdown-head>button {
   font-size: 12pt;
   background-color: var(--section-background);
   border: 1px solid var(--section-border-2);
@@ -20,9 +20,9 @@
   cursor: pointer;
 }
 
-.dropdown > .dropdown-head > button > span,
-.dropdown > .dropdown-body > button > span,
-.input-autocomplete-results > button > span {
+.dropdown>.dropdown-head>button>span,
+.dropdown>.dropdown-body>button>span,
+.input-autocomplete-results>button>span {
   flex: 1 0;
   text-align: center;
   white-space: nowrap;
@@ -31,24 +31,25 @@
   color: var(--main-text-color);
 }
 
-.dropdown > .dropdown-head > button > img {
+.dropdown>.dropdown-head>button>img {
   height: 24px;
   transform: rotate(90deg);
 }
 
-.dropdown.open > .dropdown-head > button > img {
+.dropdown.open>.dropdown-head>button>img {
   height: 24px;
   transform: rotate(-90deg);
 }
 
-.dropdown > .dropdown-body,
+.dropdown>.dropdown-body,
 .input-autocomplete-results {
   position: absolute;
   transform: translateY(8px);
   display: flex;
   flex-direction: column;
   max-height: 250px;
-  overflow-y: scroll;
+  overflow-y: auto;
+  scrollbar-width: thin;
   border-radius: 12px;
   border: 1px solid var(--section-border-2);
   width: 100%;
@@ -60,8 +61,8 @@
   transform: translateY(56px) translateX(-1px);
 }
 
-.dropdown > .dropdown-body > button,
-.input-autocomplete-results > button {
+.dropdown>.dropdown-body>button,
+.input-autocomplete-results>button {
   flex: 0 0 fit-content;
   font-size: 12pt;
   background-color: var(--section-background);
@@ -78,21 +79,21 @@
   cursor: pointer;
 }
 
-.dropdown > .dropdown-body > button:focus,
-.input-autocomplete-results > button:focus {
+.dropdown>.dropdown-body>button:focus,
+.input-autocomplete-results>button:focus {
   outline: 2px solid var(--color-accent-0);
   z-index: 1;
 }
 
-.dropdown > .dropdown-body > button:not(:first-child),
-.input-autocomplete-results > button:not(:first-child) {
+.dropdown>.dropdown-body>button:not(:first-child),
+.input-autocomplete-results>button:not(:first-child) {
   border-top: 1px solid var(--section-border-2);
 }
 
-.dropdown > .dropdown-body > button:hover,
-.dropdown > .dropdown-body > button.active,
-.input-autocomplete-results > button:hover,
-.input-autocomplete-results > button:active {
+.dropdown>.dropdown-body>button:hover,
+.dropdown>.dropdown-body>button.active,
+.input-autocomplete-results>button:hover,
+.input-autocomplete-results>button:active {
   background-color: var(--table-cell-hover);
 }
 
@@ -161,7 +162,7 @@ input[type="range"]::-moz-range-thumb {
   border-radius: 12px;
 }
 
-.text-input-container > input {
+.text-input-container>input {
   flex-grow: 1;
 }
 
@@ -181,7 +182,7 @@ input::placeholder {
   align-items: center;
 }
 
-.form-item > hr {
+.form-item>hr {
   flex-grow: 1;
   height: 0;
   border: none;
