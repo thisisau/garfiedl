@@ -33,12 +33,13 @@ export default function UserProfile() {
   const [followed, setFollowed] = useState(false);
 
   useEffect(() => {
-    if (profile.displayName === "me") {
+    const newUsername = params.username;
+    if (!newUsername || profile.displayName === "me") {
       return;
     }
 
     supabase
-      .rpc("get_user_info", { username: profile.displayName })
+      .rpc("get_user_info", { username: newUsername })
       .then((data) => {
         if (data.data === null) {
           updateProfile((profile) => (profile.exists = false));
@@ -54,10 +55,11 @@ export default function UserProfile() {
               followers: response.follower_count,
               following: response.following_count,
             };
+            profile.displayName = newUsername;
           });
         }
       });
-  }, [profile.displayName]);
+  }, [params.username]);
 
   useEffect(() => {
     if (profile.id !== null)
@@ -105,7 +107,7 @@ export default function UserProfile() {
       <div className="content">
         <div className="home-panels">
           <NavPanel />
-          <div className="center-panel">
+          <div className="center-panel" key={profile.displayName}>
             <div className="nav-header section">
               <LinkIconWithTooltip
                 tooltip="Back"
@@ -122,7 +124,13 @@ export default function UserProfile() {
                 }}
                 src="/icons/arrow-left.svg"
               />
-              <span>{profile.displayName === "me" ? <l-dot-pulse color={"white"} /> : profile.displayName}</span>
+              <span>
+                {profile.displayName === "me" ? (
+                  <l-dot-pulse color={"white"} />
+                ) : (
+                  profile.displayName
+                )}
+              </span>
               {session?.data.user?.id && profile.id && (
                 <LinkIconWithTooltip
                   tooltip={followed ? "Following" : "Follow"}
