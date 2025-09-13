@@ -11,21 +11,27 @@ function NavLinks() {
   const addAlert = useAddAlert();
   return (
     <div className="links">
-      <Link to="/terms">Terms</Link> <Link to="/privacy">Privacy</Link>{" "}
-      <a
-        href="."
-        onClick={(e) => {
-          e.preventDefault();
-          addAlert(
-            <Modal title="Contact">
-              For inquiries and support, contact
-              james.a&nbsp;[at]&nbsp;garfiedl&nbsp;[dot]&nbsp;com
-            </Modal>
-          );
-        }}
-      >
-        Contact
-      </a>
+      <div>
+        <Link to="/terms">Terms</Link>
+        <Link to="/privacy">Privacy</Link>
+        <a
+          href="."
+          onClick={(e) => {
+            e.preventDefault();
+            addAlert(
+              <Modal title="Contact">
+                For inquiries and support, contact
+                james.a&nbsp;[at]&nbsp;garfiedl&nbsp;[dot]&nbsp;com
+              </Modal>
+            );
+          }}
+        >
+          Contact
+        </a>
+      </div>
+      <div>
+        <Link to="https://github.com/thisisau/garfiedl" target="_blank">Repository</Link>
+      </div>
     </div>
   );
 }
