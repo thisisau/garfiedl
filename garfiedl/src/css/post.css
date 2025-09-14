@@ -311,6 +311,10 @@
   gap: 0;
 }
 
+.post-preview>.post-content>.information>.options .dropdown-body>button:focus {
+  filter: brightness(1.25);
+}
+
 .post-preview>.post-content>.information>.options .dropdown-body>button .icon-container {
   height: 24px;
   width: 24px;
