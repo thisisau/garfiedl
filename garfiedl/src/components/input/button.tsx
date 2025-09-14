@@ -1,10 +1,11 @@
-import { MouseEventHandler, ReactNode } from "react";
+import { KeyboardEventHandler, MouseEventHandler, ReactNode } from "react";
 import { concatClasses } from "../../functions/functions";
 import { RecursiveArray, ClassArray } from "../../functions/types";
 
 export default function Button(props: {
   children: string | RecursiveArray<String> | ReactNode;
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  onKeyUp?: KeyboardEventHandler<HTMLButtonElement>;
   className?: string | ClassArray;
   type?: "button" | "submit" | "reset";
   id?: string;
@@ -19,7 +20,7 @@ export default function Button(props: {
         props.color && props.color !== "pink" && props.color,
         props.className
       )}
-      onClick={props.onClick}
+      onClick={props.onClick} onKeyUp={props.onKeyUp}
     >
       {props.children}
     </button>
