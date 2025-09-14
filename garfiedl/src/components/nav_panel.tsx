@@ -1,4 +1,9 @@
-import { HTMLAttributeAnchorTarget, MouseEventHandler, useRef } from "react";
+import {
+  HTMLAttributeAnchorTarget,
+  KeyboardEvent,
+  MouseEventHandler,
+  useRef,
+} from "react";
 import { useOpenPostDraft } from "./post_creator";
 import { useIsLoggedIn } from "../supabase/hooks";
 import { useScreenSize } from "../functions/hooks";
@@ -6,6 +11,7 @@ import { Dropdown } from "./input/dropdown";
 import { Link } from "react-router-dom";
 import { useAddAlert } from "./alerts/alert_hooks";
 import { Modal } from "./modal";
+import Button from "./input/button";
 
 function NavLinks() {
   const addAlert = useAddAlert();
@@ -30,7 +36,9 @@ function NavLinks() {
         </a>
       </div>
       <div>
-        <Link to="https://github.com/thisisau/garfiedl" target="_blank">Repository</Link>
+        <Link to="https://github.com/thisisau/garfiedl" target="_blank">
+          Repository
+        </Link>
       </div>
     </div>
   );
@@ -41,12 +49,34 @@ export default function NavPanel() {
   const openPostDraft = useOpenPostDraft();
   const panelRef = useRef<HTMLDivElement>(null);
   const screenSize = useScreenSize();
+  const skipNavigationCallback = (e?: KeyboardEvent<HTMLButtonElement>) => {
+    if (e && e.key != "Enter") {
+      return;
+    }
+    (
+      document.querySelector(
+        ["a", "[tabindex]", "input", "button"]
+          .map((e) => `.center-panel ${e}`)
+          .join(",")
+      ) as HTMLDivElement
+    ).focus();
+  };
+  const skipNavigationButton = (
+    <Button
+      className={"skip-navigation"}
+      onClick={() => skipNavigationCallback()}
+      onKeyUp={skipNavigationCallback}
+    >
+      Skip Navigation
+    </Button>
+  );
   if (screenSize.width >= 990)
     return (
       <div className="nav-panel" ref={panelRef}>
         <Link className="home-link" to="/">
           garfiedl.com
         </Link>
+        {skipNavigationButton}
         {isLoggedIn ? (
           <>
             <NavOption
@@ -92,6 +122,7 @@ export default function NavPanel() {
       <Link className="home-link" to="/">
         <img src="/favicon.ico" />
       </Link>
+      {skipNavigationButton}
       <Dropdown
         containerClass="mobile-navigator"
         header={

@@ -389,12 +389,10 @@ export function PostPreview(props: {
             }
           }}
           onClick={(e) => {
-            if (isNotLinkable) return;
             if (e.ctrlKey || e.metaKey) openPostInNewTab();
             else if (!props.displayData?.noLink?.includes(post.id)) openPost();
           }}
           onKeyDown={(e) => {
-            if (isNotLinkable) return;
             if (
               e.key === "Enter" &&
               !props.displayData?.noLink?.includes(post.id)

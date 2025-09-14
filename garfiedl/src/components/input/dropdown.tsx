@@ -1,4 +1,11 @@
-import { CSSProperties, MouseEventHandler, ReactNode, useEffect, useRef, useState } from "react";
+import {
+  CSSProperties,
+  MouseEventHandler,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { concatClasses } from "../../functions/functions";
 
 export function Dropdown(props: {
@@ -7,7 +14,7 @@ export function Dropdown(props: {
   containerClass?: string;
   containerStyle?: CSSProperties;
   generateHeader?: boolean;
-  onClick?: MouseEventHandler<HTMLDivElement>
+  onClick?: MouseEventHandler<HTMLDivElement>;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -64,6 +71,11 @@ export function Dropdown(props: {
       ref={dropdownRef}
       style={props.containerStyle}
       onClick={props.onClick}
+      onBlur={()=>{
+        setTimeout(() => {
+          if (!dropdownRef.current?.contains(document.activeElement)) setIsOpen(false)
+        })
+      }}
     >
       {props.generateHeader ? (
         <div className="dropdown-head">
@@ -82,6 +94,14 @@ export function Dropdown(props: {
           onClick={() => {
             setIsOpen(!isOpen);
           }}
+          onKeyDown={(e) => {
+            if ([" ", "Enter"].includes(e.key)) {
+              e.preventDefault();
+              setIsOpen(!isOpen);
+            }
+          }}
+          role="button"
+          tabIndex={0}
         >
           {props.header}
         </div>

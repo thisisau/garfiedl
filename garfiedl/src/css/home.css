@@ -200,3 +200,20 @@ hr.gray {
     align-items: center;
   }
 }
+
+.skip-navigation {
+  transition: none;
+}
+
+.skip-navigation:not(:focus) {
+  position: absolute;
+  left: -1000px;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.skip-navigation:focus {
+  width: 180px;
+  align-self: end;
+}
