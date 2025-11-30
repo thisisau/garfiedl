@@ -11,6 +11,7 @@ import {
 } from "./components/alerts/alert_context";
 import { GlobalElement } from "./components/alerts/global_element";
 import AfterSignup from "./pages/after_signup";
+import { Analytics } from "@vercel/analytics/react";
 
 import "./css/index.css";
 import "./css/input.css";
@@ -51,6 +52,7 @@ function App() {
         </BrowserRouter>
         <GlobalElement />
       </AlertHandlerContext.Provider>
+      <Analytics />
     </>
   );
 }
